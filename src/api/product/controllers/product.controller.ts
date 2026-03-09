@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { RoleIds } from '../../role/enum/role.enum';
 import { CreateProductDto, ProductDetailsDto } from '../dto/product.dto';
 import { ProductService } from '../services/product.service';
@@ -6,10 +14,21 @@ import { Auth } from 'src/api/auth/guards/auth.decorator';
 import { FindOneParams } from 'src/common/helper/findOneParams.dto';
 import { CurrentUser } from 'src/api/auth/guards/user.decorator';
 import { User } from 'src/database/entities/user.entity';
+import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  /**
+   * List all active products with pagination
+   * GET /api/product?page=1&limit=10
+   * Public endpoint - no authentication required (standard e-commerce behavior)
+   */
+  @Get() // Empty decorator = root path of controller (/product)
+  async getProducts(@Query() query: PaginationQueryDto) {
+    return this.productService.getProducts(query);
+  }
 
   @Get(':id')
   async getProduct(@Param() product: FindOneParams) {

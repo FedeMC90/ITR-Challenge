@@ -237,11 +237,97 @@ These follow the "just enough to work" principle - we can add them later if need
 
 ---
 
+### Task 2: Product Listing Endpoint ✅ COMPLETED
+
+**Files Modified**: `src/api/product/controllers/product.controller.ts`, `src/api/product/services/product.service.ts`  
+**Files Created**: `src/common/dto/pagination.dto.ts`
+
+#### Change: Add GET /api/product endpoint with pagination
+
+**Problem Addressed**: Frontend cannot display product catalog without a listing endpoint.
+
+**Implementation** (Minimal Viable):
+
+1. **Pagination DTO** (`pagination.dto.ts`):
+
+```typescript
+export class PaginationQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1; // Default page 1
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10; // Default 10 items, max 100
+}
+```
+
+2. **Service Method** (`product.service.ts`):
+
+```typescript
+async getProducts(query: PaginationQueryDto) {
+  const { page = 1, limit = 10 } = query;
+  const skip = (page - 1) * limit;
+
+  const [products, total] = await this.entityManager.findAndCount(Product, {
+    where: { isActive: true },  // Only active products
+    skip,
+    take: limit,
+    order: { createdAt: 'DESC' },  // Newest first
+  });
+
+  return {
+    data: products,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) }
+  };
+}
+```
+
+3. **Controller Endpoint** (`product.controller.ts`):
+
+```typescript
+@Get()
+async getProducts(@Query() query: PaginationQueryDto) {
+  return this.productService.getProducts(query);
+}
+```
+
+**Technical Decisions**:
+
+- **Public Endpoint**: No `@Auth()` decorator → Anyone can view products (standard e-commerce behavior)
+- **Active Products Only**: `where: { isActive: true }` → Don't show drafts/inactive products to customers
+- **Standardized Response**: Includes `meta` object with pagination info for frontend consumption
+- **Order**: `createdAt: 'DESC'` → Show newest products first (common UX pattern)
+- **Reusable DTO**: Created in `common/dto/` for use across other modules (users, orders, etc.)
+
+**What Was NOT Implemented** (Following "minimal viable" principle):
+❌ Search/filtering by category, price, name (can add later if needed)  
+❌ Sorting options (currently hardcoded to newest first)  
+❌ Product relations/joins (category, variations) - keeps response lightweight  
+❌ Caching (not needed for MVP)
+
+**Verification**:
+
+```bash
+curl http://localhost:3000/api/product
+# Response: {"isSuccess":true,"message":"success","data":{"data":[],"meta":{"total":0,"page":1,"limit":10,"totalPages":0}}}
+```
+
+Empty array is expected - no active products exist yet. Angular frontend can now consume this endpoint.
+
+---
+
 ## Next Steps
 
 ### Pending Tasks (Step 2)
 
-- [ ] **Task 2**: Add `GET /api/products` endpoint with pagination (required for frontend catalog)
+- [x] **Task 1**: Frontend Integration (CORS, API prefix, configurable port) ✅
+- [x] **Task 2**: Add `GET /api/products` endpoint with pagination ✅
 - [ ] **Task 3**: Create Order module (entities, DTOs, basic service)
 - [ ] **Task 4**: Install and configure EventEmitter2
 - [ ] **Task 5**: Create Inventory service with stock management
@@ -307,4 +393,4 @@ These follow the "just enough to work" principle - we can add them later if need
 ---
 
 **Last Updated**: March 9, 2026  
-**Status**: Step 2 - Task 1 Complete, Ready for Task 2
+**Status**: Step 2 - Tasks 1-2 Complete (Frontend Integration + Product Listing), Ready for Task 3 (Order Module)
