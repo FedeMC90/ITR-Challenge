@@ -7,6 +7,7 @@ import { OrderItem } from 'src/database/entities/order-item.entity';
 import { Product } from 'src/database/entities/product.entity';
 import { CreateOrderDto } from '../dto/order.dto';
 import { OrderCreatedEvent } from 'src/common/events/order-created.event';
+import { OrderCancelledEvent } from 'src/common/events/order-cancelled.event';
 
 @Injectable()
 export class OrderService {
@@ -86,6 +87,43 @@ export class OrderService {
       where: { userId },
       relations: ['items', 'items.product'],
       order: { createdAt: 'DESC' },
+    });
+  }
+
+  async cancelOrder(orderId: number, userId: number) {
+    return await this.entityManager.transaction(async (manager) => {
+      // Find order and verify ownership
+      const order = await manager.findOne(Order, {
+        where: { id: orderId, userId },
+        relations: ['items'],
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with id ${orderId} not found`);
+      }
+
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new Error('Order is already cancelled');
+      }
+
+      // Update order status
+      order.status = OrderStatus.CANCELLED;
+      await manager.save(order);
+
+      // Emit OrderCancelledEvent for decoupled handling (e.g., inventory release)
+      this.eventEmitter.emit(
+        'order.cancelled',
+        new OrderCancelledEvent(
+          order.id,
+          userId,
+          order.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        ),
+      );
+
+      return order;
     });
   }
 }
