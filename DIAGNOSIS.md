@@ -322,13 +322,197 @@ Empty array is expected - no active products exist yet. Angular frontend can now
 
 ---
 
+### Task 3: Order Module Creation ✅ COMPLETED
+
+**Files Created**:
+
+- `src/database/entities/order.entity.ts` - Order entity
+- `src/database/entities/order-item.entity.ts` - OrderItem entity
+- `src/api/order/dto/order.dto.ts` - DTOs for order creation
+- `src/api/order/services/order.service.ts` - Order business logic
+- `src/api/order/controllers/order.controller.ts` - Order endpoints
+- `src/api/order/order.module.ts` - Order module configuration
+- `src/database/migration/history/1773073661822-create-order-tables.ts` - Database migration
+
+**Files Modified**:
+
+- `src/api/api.module.ts` - Added OrderModule import
+
+#### Implementation (Minimal Viable)
+
+**1. Entities** (Following existing patterns):
+
+```typescript
+// Order entity
+@Entity()
+export class Order {
+  @PrimaryGeneratedColumn()
+  public id!: number;
+
+  @Column({ type: 'int' })
+  public userId: number;
+
+  @ManyToOne(() => User)
+  public user: User;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  public items: OrderItem[];
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  public totalAmount: number;
+
+  @Column({ type: 'varchar', length: 20, default: OrderStatus.PENDING })
+  public status: OrderStatus; // PENDING | CONFIRMED | CANCELLED
+}
+
+// OrderItem entity
+@Entity()
+export class OrderItem {
+  @PrimaryGeneratedColumn()
+  public id!: number;
+
+  @ManyToOne(() => Order, (order) => order.items)
+  public order: Order;
+
+  @ManyToOne(() => Product)
+  public product: Product;
+
+  @Column({ type: 'int' })
+  public quantity: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  public price: number; // Price at time of purchase (historical record)
+}
+```
+
+**2. DTOs** (Simple validation):
+
+```typescript
+export class CreateOrderItemDto {
+  @IsInt()
+  @IsPositive()
+  productId: number;
+
+  @IsInt()
+  @Min(1)
+  quantity: number;
+}
+
+export class CreateOrderDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  items: CreateOrderItemDto[];
+}
+```
+
+**3. Service** (Transaction-based):
+
+```typescript
+async createOrder(userId: number, createOrderDto: CreateOrderDto) {
+  return await this.entityManager.transaction(async (manager) => {
+    // Create order
+    const order = manager.create(Order, { userId, status: OrderStatus.PENDING });
+    await manager.save(order);
+
+    // Create items and calculate total
+    const orderItems = await Promise.all(
+      createOrderDto.items.map(async (item) => {
+        const product = await manager.findOne(Product, {
+          where: { id: item.productId, isActive: true }
+        });
+        if (!product) throw new NotFoundException(...);
+
+        return manager.create(OrderItem, { ...item, orderId: order.id });
+      })
+    );
+
+    await manager.save(orderItems);
+    order.totalAmount = /* calculate total */;
+    await manager.save(order);
+
+    return order;
+  });
+}
+```
+
+**4. Controller** (Authenticated endpoints):
+
+```typescript
+@Controller('order')
+export class OrderController {
+  @Auth() // Requires authentication
+  @Post()
+  async createOrder(@Body() dto: CreateOrderDto, @CurrentUser() user: User) {
+    return this.orderService.createOrder(user.id, dto);
+  }
+
+  @Auth()
+  @Get()
+  async getMyOrders(@CurrentUser() user: User) {
+    return this.orderService.getOrdersByUser(user.id);
+  }
+}
+```
+
+**Routes Created**:
+
+- `POST /api/order` - Create new order (authenticated)
+- `GET /api/order` - Get user's orders (authenticated)
+
+**Database Migration Executed**:
+
+```sql
+CREATE TABLE "order" (...);
+CREATE TABLE "order_item" (...);
+ALTER TABLE "order" ADD CONSTRAINT FK_userId;
+ALTER TABLE "order_item" ADD CONSTRAINT FK_orderId;
+ALTER TABLE "order_item" ADD CONSTRAINT FK_productId;
+```
+
+#### Technical Decisions
+
+**Why Transaction?**
+
+- Ensures atomicity: either entire order is created or nothing happens
+- Prevents orphaned order items if order creation fails
+- Critical for data integrity in e-commerce
+
+**Why OrderStatus enum?**
+
+- Simple state machine: PENDING → CONFIRMED (or CANCELLED)
+- Extensible for future states (SHIPPED, DELIVERED, REFUNDED)
+- Type-safe in TypeScript
+
+**Why store `price` in OrderItem?**
+
+- **Historical accuracy**: Product prices change over time
+- Order should reflect price at time of purchase, not current price
+- Prevents discrepancies in financial records
+- Simplified for MVP (would normally come from ProductVariation pricing)
+
+**What Was NOT Implemented** (Following "minimal viable"):
+❌ Stock validation (will be handled by events in Step 3)  
+❌ Payment processing  
+❌ Shipping address  
+❌ Order status transitions/workflow  
+❌ Product variations pricing (simplified to 0 for MVP)  
+❌ Order cancellation endpoint  
+❌ Admin order management
+
+**Critical for Next Step**:
+This Order module is **decoupled** - it doesn't directly call InventoryService. This sets up the foundation for event-driven architecture where creating an order will emit an `OrderCreatedEvent` that InventoryService listens to.
+
+---
+
 ## Next Steps
 
 ### Pending Tasks (Step 2)
 
 - [x] **Task 1**: Frontend Integration (CORS, API prefix, configurable port) ✅
 - [x] **Task 2**: Add `GET /api/products` endpoint with pagination ✅
-- [ ] **Task 3**: Create Order module (entities, DTOs, basic service)
+- [x] **Task 3**: Create Order module (entities, DTOs, basic service) ✅
 - [ ] **Task 4**: Install and configure EventEmitter2
 - [ ] **Task 5**: Create Inventory service with stock management
 
@@ -393,4 +577,4 @@ Empty array is expected - no active products exist yet. Angular frontend can now
 ---
 
 **Last Updated**: March 9, 2026  
-**Status**: Step 2 - Tasks 1-2 Complete (Frontend Integration + Product Listing), Ready for Task 3 (Order Module)
+**Status**: Step 2 - Tasks 1-3 Complete (Frontend + Products API + Order Module), Ready for Event-Driven Implementation
