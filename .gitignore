@@ -1,8 +1,10 @@
 # Dependencies
 node_modules/
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 package-lock.json
 yarn.lock
 
@@ -12,6 +14,7 @@ build/
 .angular/
 .next/
 out/
+/dist
 
 # Environment files
 .env
@@ -20,16 +23,28 @@ out/
 *.env
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
 # Testing
 coverage/
+/.nyc_output
 *.log
+logs
 
 # NestJS
 nestjs-ecommerce/dist/
@@ -43,7 +58,9 @@ ecommerce-frontend/.env
 # Database
 *.sqlite
 *.db
+database-data
 
 # OS
 Thumbs.db
 .DS_Store
+
