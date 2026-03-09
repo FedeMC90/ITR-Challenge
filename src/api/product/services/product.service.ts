@@ -11,6 +11,7 @@ import { Product } from 'src/database/entities/product.entity';
 import { errorMessages } from 'src/errors/custom';
 import { validate } from 'class-validator';
 import { successObject } from 'src/common/helper/sucess-response.interceptor';
+import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class ProductService {
@@ -18,6 +19,35 @@ export class ProductService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
+
+  /**
+   * Retrieve paginated list of active products
+   * Returns only products that are marked as active (no drafts/inactive items)
+   * Ordered by newest first
+   */
+  async getProducts(query: PaginationQueryDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit; // Calculate offset for database query
+
+    // findAndCount returns [data, total]
+    const [products, total] = await this.entityManager.findAndCount(Product, {
+      where: { isActive: true },
+      skip,
+      take: limit, // Limit number of results
+      order: { createdAt: 'DESC' }, // Show newest products first
+    });
+
+    // Return standardized response with data and pagination metadata
+    return {
+      data: products,
+      meta: {
+        total, // Total count of all products (for pagination UI)
+        page, // Current page number
+        limit, // Items per page
+        totalPages: Math.ceil(total / limit), // Total pages available
+      },
+    };
+  }
 
   async getProduct(productId: number) {
     const product = await this.entityManager.findOne(Product, {
