@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Param, Post } from '@nestjs/common';
 import { OrderService } from '../services/order.service';
 import { CreateOrderDto } from '../dto/order.dto';
 import { Auth } from 'src/api/auth/guards/auth.decorator';
@@ -22,5 +22,11 @@ export class OrderController {
   @Get()
   async getMyOrders(@CurrentUser() user: User) {
     return this.orderService.getOrdersByUser(user.id);
+  }
+
+  @Auth()
+  @Patch(':id/cancel')
+  async cancelOrder(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.orderService.cancelOrder(parseInt(id), user.id);
   }
 }
