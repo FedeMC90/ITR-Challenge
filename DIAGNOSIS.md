@@ -506,6 +506,130 @@ This Order module is **decoupled** - it doesn't directly call InventoryService. 
 
 ---
 
+### Task 4: EventEmitter2 Installation & Configuration ✅ COMPLETED
+
+**Package Installed**: `@nestjs/event-emitter@2.0.4` (compatible with NestJS 9)
+
+**Files Modified**:
+
+- `src/app.module.ts` - Added EventEmitterModule configuration
+- `src/api/order/services/order.service.ts` - Inject EventEmitter2 and emit events
+
+**Files Created**:
+
+- `src/common/events/order-created.event.ts` - OrderCreatedEvent domain event
+- `src/common/events/order-cancelled.event.ts` - OrderCancelledEvent domain event
+
+#### Implementation (Minimal Viable)
+
+**1. Module Configuration** (`app.module.ts`):
+
+```typescript
+import { EventEmitterModule } from '@nestjs/event-emitter';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
+    EventEmitterModule.forRoot(), // ← Event-driven infrastructure
+    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    ApiModule,
+  ],
+})
+export class AppModule {}
+```
+
+**2. Domain Events** (Event classes as data carriers):
+
+```typescript
+// order-created.event.ts
+export class OrderCreatedEvent {
+  constructor(
+    public readonly orderId: number,
+    public readonly userId: number,
+    public readonly items: Array<{
+      productId: number;
+      quantity: number;
+    }>,
+  ) {}
+}
+
+// order-cancelled.event.ts (prepared for future use)
+export class OrderCancelledEvent {
+  constructor(
+    public readonly orderId: number,
+    public readonly userId: number,
+    public readonly items: Array<{ productId: number; quantity: number }>,
+  ) {}
+}
+```
+
+**3. Event Emission** (`order.service.ts`):
+
+```typescript
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OrderCreatedEvent } from 'src/common/events/order-created.event';
+
+@Injectable()
+export class OrderService {
+  constructor(
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
+    private readonly eventEmitter: EventEmitter2, // ← Injected
+  ) {}
+
+  async createOrder(userId: number, createOrderDto: CreateOrderDto) {
+    return await this.entityManager.transaction(async (manager) => {
+      // ... create order and items ...
+
+      // Emit event for decoupled processing (inventory, notifications, etc.)
+      this.eventEmitter.emit(
+        'order.created',
+        new OrderCreatedEvent(order.id, userId, createOrderDto.items),
+      );
+
+      return createdOrder;
+    });
+  }
+}
+```
+
+#### Technical Decisions
+
+**Why EventEmitter2 vs Message Broker (RabbitMQ/Redis)?**
+
+- **In-Process**: No external infrastructure needed (Docker, queues)
+- **Synchronous**: Events processed immediately in same transaction context
+- **Sufficient for Monolith**: Achieves decoupling without microservices complexity
+- **Easy Testing**: No need to mock external message brokers
+- **Migration Path**: Can later replace with RabbitMQ/SQS if scaling requires it
+
+**Why NestJS Event Pattern?**
+
+- **Convention**: Uses decorator-based listeners (`@OnEvent()`)
+- **Type-Safe**: Event classes provide IntelliSense and compile-time checks
+- **Testable**: Can easily unit test event handlers in isolation
+- **Standard**: Follows NestJS ecosystem patterns (matches Guards, Interceptors, etc.)
+
+**Event Naming Convention**:
+
+- Pattern: `[entity].[action]` → `order.created`, `order.cancelled`
+- Lowercase with dot notation (common in event-driven systems)
+- Past tense: "created" not "create" (event already happened)
+
+**What Was NOT Implemented** (Following "minimal viable"):
+❌ Event listeners (will be implemented in Step 3)  
+❌ Event replay/history  
+❌ Dead letter queue for failed events  
+❌ Event versioning  
+❌ Async event processing
+
+**Critical Achievement**:
+✅ **Decoupling**: OrderService emits events but doesn't know who listens
+✅ **Foundation for Step 3**: Infrastructure ready for InventoryService to listen
+✅ **No breaking changes**: Existing functionality still works, events are additions
+
+---
+
 ## Next Steps
 
 ### Pending Tasks (Step 2)
@@ -513,7 +637,7 @@ This Order module is **decoupled** - it doesn't directly call InventoryService. 
 - [x] **Task 1**: Frontend Integration (CORS, API prefix, configurable port) ✅
 - [x] **Task 2**: Add `GET /api/products` endpoint with pagination ✅
 - [x] **Task 3**: Create Order module (entities, DTOs, basic service) ✅
-- [ ] **Task 4**: Install and configure EventEmitter2
+- [x] **Task 4**: Install and configure EventEmitter2 ✅
 - [ ] **Task 5**: Create Inventory service with stock management
 
 ### Step 3: Event-Driven Implementation
@@ -577,4 +701,4 @@ This Order module is **decoupled** - it doesn't directly call InventoryService. 
 ---
 
 **Last Updated**: March 9, 2026  
-**Status**: Step 2 - Tasks 1-3 Complete (Frontend + Products API + Order Module), Ready for Event-Driven Implementation
+**Status**: Step 2 - Tasks 1-4 Complete (Frontend + Products + Orders + Events), Ready for Task 5 (Inventory Service)

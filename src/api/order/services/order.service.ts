@@ -1,17 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from 'typeorm';
 import { Order, OrderStatus } from 'src/database/entities/order.entity';
 import { OrderItem } from 'src/database/entities/order-item.entity';
 import { Product } from 'src/database/entities/product.entity';
 import { CreateOrderDto } from '../dto/order.dto';
-import { errorMessages } from 'src/errors/custom';
+import { OrderCreatedEvent } from 'src/common/events/order-created.event';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createOrder(userId: number, createOrderDto: CreateOrderDto) {
@@ -57,10 +59,25 @@ export class OrderService {
       await manager.save(order);
 
       // Return order with items
-      return await manager.findOne(Order, {
+      const createdOrder = await manager.findOne(Order, {
         where: { id: order.id },
         relations: ['items', 'items.product'],
       });
+
+      // Emit OrderCreatedEvent for decoupled handling (e.g., inventory update)
+      this.eventEmitter.emit(
+        'order.created',
+        new OrderCreatedEvent(
+          order.id,
+          userId,
+          createOrderDto.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        ),
+      );
+
+      return createdOrder;
     });
   }
 
