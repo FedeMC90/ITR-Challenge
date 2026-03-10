@@ -15,13 +15,29 @@
       </div>
 
       <div class="product-list" *ngIf="availableProducts.length > 0">
-        <div class="product-item" *ngFor="let product of availableProducts">
+        <div
+          class="product-item"
+          [class.inactive]="!product.isActive"
+          *ngFor="let product of availableProducts"
+        >
           <div class="product-info">
             <strong>{{ product.title }}</strong>
             <span class="product-code">{{ product.code }}</span>
+            <span class="status-badge inactive" *ngIf="!product.isActive">
+              Inactive
+            </span>
           </div>
-          <button class="btn-add" (click)="addProduct(product)">
-            Add to Order
+          <button
+            class="btn-add"
+            (click)="addProduct(product)"
+            [disabled]="!product.isActive"
+            [title]="
+              !product.isActive
+                ? 'This product is inactive and cannot be added to orders'
+                : 'Add to order'
+            "
+          >
+            {{ product.isActive ? 'Add to Order' : 'Unavailable' }}
           </button>
         </div>
       </div>
@@ -59,7 +75,7 @@
           (click)="submitOrder()"
           [disabled]="submitting"
         >
-          {{ submitting ? "Placing Order..." : "Place Order" }}
+          {{ submitting ? 'Placing Order...' : 'Place Order' }}
         </button>
       </div>
 
