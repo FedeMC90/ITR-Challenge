@@ -8,6 +8,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UserRole {
+  id: number;
+  name: string;
+}
+
 export interface AuthResponse {
   isSuccess: boolean;
   data: {
@@ -16,6 +21,7 @@ export interface AuthResponse {
       email: string;
       firstName: string;
       lastName: string;
+      roles: UserRole[];
     };
     access_token: string;
   };
@@ -106,5 +112,11 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken();
     return !!token && token.length > 0;
+  }
+
+  hasRole(roleIds: number[]): boolean {
+    const user = this.getUserData();
+    if (!user || !user.roles) return false;
+    return user.roles.some((role: UserRole) => roleIds.includes(role.id));
   }
 }

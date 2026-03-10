@@ -115,6 +115,30 @@ export class ProductService {
     return result.raw[0];
   }
 
+  async toggleProductStatus(productId: number, merchantId: number) {
+    const product = await this.entityManager.findOne(Product, {
+      where: {
+        id: productId,
+        merchantId,
+      },
+    });
+
+    if (!product) throw new NotFoundException(errorMessages.product.notFound);
+
+    const result = await this.entityManager
+      .createQueryBuilder()
+      .update<Product>(Product)
+      .set({
+        isActive: !product.isActive,
+      })
+      .where('id = :id', { id: productId })
+      .andWhere('merchantId = :merchantId', { merchantId })
+      .returning(['id', 'isActive', 'title'])
+      .execute();
+
+    return result.raw[0];
+  }
+
   async validate(productId: number) {
     const product = await this.entityManager.findOne(Product, {
       where: {

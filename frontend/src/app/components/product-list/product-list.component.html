@@ -4,7 +4,7 @@
     <button
       class="btn-create"
       (click)="navigateToCreate()"
-      *ngIf="isAuthenticated$ | async"
+      *ngIf="canToggleStatus()"
     >
       + Create Product
     </button>
@@ -22,13 +22,29 @@
   </div>
 
   <div class="products-grid" *ngIf="products.length > 0">
-    <div class="product-card" *ngFor="let product of products" [class.inactive]="!product.isActive">
+    <div
+      class="product-card"
+      *ngFor="let product of products"
+      [class.inactive]="!product.isActive"
+    >
       <div class="product-header">
         <h3>{{ product.title }}</h3>
         <span class="product-code">{{ product.code }}</span>
-        <span class="status-badge" [class.active]="product.isActive" [class.inactive-badge]="!product.isActive">
+        <button
+          class="status-badge"
+          [class.active]="product.isActive"
+          [class.inactive-badge]="!product.isActive"
+          [class.clickable]="canToggleStatus()"
+          [disabled]="!canToggleStatus()"
+          (click)="toggleProductStatus(product, $event)"
+          [title]="
+            canToggleStatus()
+              ? 'Click to ' + (product.isActive ? 'deactivate' : 'activate')
+              : 'You need Admin or Merchant role'
+          "
+        >
           {{ product.isActive ? 'Active' : 'Inactive' }}
-        </span>
+        </button>
       </div>
       <p class="product-description">
         {{ product.description || 'No description available' }}

@@ -85,4 +85,11 @@ export class ProductService {
       {},
     );
   }
+
+  toggleProductStatus(productId: number): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/product/${productId}/toggle-status`,
+      {},
+    );
+  }
 }

@@ -23,7 +23,9 @@ export class AuthService {
 
   async login(user: CreateUserDto) {
     const { email, password } = user;
-    const alreadyExistingUser = await this.userService.findByEmail(email);
+    const alreadyExistingUser = await this.userService.findByEmail(email, {
+      roles: true,
+    });
     if (!alreadyExistingUser)
       throw new UnauthorizedException(errorMessages.auth.wronCredentials);
 
@@ -45,6 +47,10 @@ export class AuthService {
         email: alreadyExistingUser.email,
         firstName: '',
         lastName: '',
+        roles: alreadyExistingUser.roles.map((role) => ({
+          id: role.id,
+          name: role.name,
+        })),
       },
       access_token: token.accessToken,
     };

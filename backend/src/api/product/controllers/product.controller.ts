@@ -64,6 +64,15 @@ export class ProductController {
   }
 
   @Auth(RoleIds.Admin, RoleIds.Merchant)
+  @Post(':id/toggle-status')
+  async toggleProductStatus(
+    @Param() product: FindOneParams,
+    @CurrentUser() user: User,
+  ) {
+    return this.productService.toggleProductStatus(product.id, user.id);
+  }
+
+  @Auth(RoleIds.Admin, RoleIds.Merchant)
   @Delete(':id')
   async deleteProduct(
     @Param() product: FindOneParams,
