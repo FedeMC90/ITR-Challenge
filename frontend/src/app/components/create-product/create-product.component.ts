@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -31,13 +31,13 @@ interface ProductForm {
   templateUrl: './create-product.component.html',
   styleUrls: ['./create-product.component.css'],
 })
-export class CreateProductComponent implements OnInit {
+export class CreateProductComponent {
   private productService = inject(ProductService);
   private router = inject(Router);
 
-  step: number = 1;
+  step = 1;
   productId: number | null = null;
-  previousCategoryId: number = 1;
+  previousCategoryId = 1;
   loading = false;
   error = '';
   success = false;
@@ -78,8 +78,6 @@ export class CreateProductComponent implements OnInit {
   capacityUnits = ['GB', 'TB'];
   capacityTypes = ['SSD', 'HD'];
   fashionSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-  ngOnInit(): void {}
 
   // Step 1: Create basic product with categoryId
   createBasicProduct(): void {
