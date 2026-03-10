@@ -21,8 +21,8 @@ export class ProductService {
   ) {}
 
   /**
-   * Retrieve paginated list of active products
-   * Returns only products that are marked as active (no drafts/inactive items)
+   * Retrieve paginated list of all products
+   * Returns all products (active and inactive)
    * Ordered by newest first
    */
   async getProducts(query: PaginationQueryDto) {
@@ -31,7 +31,6 @@ export class ProductService {
 
     // findAndCount returns [data, total]
     const [products, total] = await this.entityManager.findAndCount(Product, {
-      where: { isActive: true },
       skip,
       take: limit, // Limit number of results
       order: { createdAt: 'DESC' }, // Show newest products first
@@ -111,6 +110,30 @@ export class ProductService {
       .where('id = :id', { id: productId })
       .andWhere('merchantId = :merchantId', { merchantId })
       .returning(['id', 'isActive'])
+      .execute();
+
+    return result.raw[0];
+  }
+
+  async toggleProductStatus(productId: number, merchantId: number) {
+    const product = await this.entityManager.findOne(Product, {
+      where: {
+        id: productId,
+        merchantId,
+      },
+    });
+
+    if (!product) throw new NotFoundException(errorMessages.product.notFound);
+
+    const result = await this.entityManager
+      .createQueryBuilder()
+      .update<Product>(Product)
+      .set({
+        isActive: !product.isActive,
+      })
+      .where('id = :id', { id: productId })
+      .andWhere('merchantId = :merchantId', { merchantId })
+      .returning(['id', 'isActive', 'title'])
       .execute();
 
     return result.raw[0];

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   products: Product[] = [];
   loading = false;
@@ -58,5 +59,45 @@ export class ProductListComponent implements OnInit {
     console.log('Add to order:', product);
     // This would be implemented with a shopping cart service in production
     alert(`Product "${product.title}" added to order (feature coming soon)`);
+  }
+
+  navigateToCreate() {
+    this.router.navigate(['/create-product']);
+  }
+
+  canToggleStatus(): boolean {
+    // Role IDs: 2 = Merchant, 3 = Admin
+    return this.authService.hasRole([2, 3]);
+  }
+
+  toggleProductStatus(product: Product, event: Event) {
+    event.stopPropagation();
+
+    if (!this.canToggleStatus()) {
+      alert('You need Admin or Merchant role to change product status');
+      return;
+    }
+
+    const action = product.isActive ? 'deactivate' : 'activate';
+    if (!confirm(`Are you sure you want to ${action} this product?`)) {
+      return;
+    }
+
+    this.productService.toggleProductStatus(product.id).subscribe({
+      next: (response) => {
+        // Update the product in the list
+        product.isActive = !product.isActive;
+      },
+      error: (err) => {
+        console.error('Toggle status error:', err);
+        if (err.status === 403) {
+          alert('You are not authorized to modify this product');
+        } else if (err.status === 404) {
+          alert('Product not found or you are not the owner');
+        } else {
+          alert('Failed to update product status');
+        }
+      },
+    });
   }
 }

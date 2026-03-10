@@ -4,6 +4,34 @@
   margin: 0 auto;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.btn-create {
+  padding: 0.75rem 1.5rem;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-create:hover {
+  background: #1565c0;
+}
+
 h2 {
   color: #333;
   margin-bottom: 20px;
@@ -57,9 +85,7 @@ code {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .product-card:hover {
@@ -67,17 +93,26 @@ code {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.product-card.inactive {
+  opacity: 0.7;
+  border-color: #bdbdbd;
+  background: #fafafa;
+}
+
 .product-header {
   display: flex;
   justify-content: space-between;
   align-items: start;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 h3 {
   margin: 0;
   color: #1976d2;
   font-size: 1.2em;
+  flex: 1 1 100%;
 }
 
 .product-code {
@@ -86,6 +121,56 @@ h3 {
   border-radius: 4px;
   font-size: 0.8em;
   font-family: monospace;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: none;
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.status-badge.clickable {
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.status-badge.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge.clickable:active {
+  transform: scale(0.98);
+}
+
+.status-badge:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.status-badge.active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.active.clickable:hover {
+  background-color: #c8e6c9;
+  border-color: #2e7d32;
+}
+
+.status-badge.inactive-badge {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.inactive-badge.clickable:hover {
+  background-color: #ffcdd2;
+  border-color: #c62828;
 }
 
 .product-description {
