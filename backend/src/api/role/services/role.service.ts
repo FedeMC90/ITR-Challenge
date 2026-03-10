@@ -33,4 +33,14 @@ export class RoleService {
     }
     return role;
   }
+
+  async findAll() {
+    return this.rolesRepository.find();
+  }
+
+  async removeRoleFromUser(data: AssignRoleDto) {
+    const user = await this.userService.findById(data.userId, { roles: true });
+    user.roles = user.roles.filter((role) => role.id !== data.roleId);
+    return this.userService.save(user);
+  }
 }

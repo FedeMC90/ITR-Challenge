@@ -16,6 +16,10 @@ export class NavbarComponent {
 
   isAuthenticated$ = this.authService.isAuthenticated$;
 
+  isAdmin(): boolean {
+    return this.authService.hasRole([3]); // RoleIds.Admin = 3
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);

@@ -8,6 +8,13 @@
       <ng-container *ngIf="isAuthenticated$ | async">
         <a routerLink="/create-order" routerLinkActive="active">Create Order</a>
         <a routerLink="/orders" routerLinkActive="active">My Orders</a>
+        <a
+          *ngIf="isAdmin()"
+          routerLink="/manage-roles"
+          routerLinkActive="active"
+        >
+          Manage Roles
+        </a>
         <button class="btn-logout" (click)="logout()">Logout</button>
       </ng-container>
 
