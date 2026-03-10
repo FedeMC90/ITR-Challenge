@@ -8,8 +8,14 @@
   </div>
 
   <div *ngIf="error" class="error-message">{{ error }}</div>
-  <div *ngIf="success" class="success-message">
-    Product created successfully! Redirecting...
+
+  <!-- Success Modal Overlay -->
+  <div *ngIf="success" class="modal-overlay">
+    <div class="success-modal">
+      <div class="success-icon">✓</div>
+      <h3>Product Created Successfully!</h3>
+      <p>Redirecting to product list...</p>
+    </div>
   </div>
 
   <!-- Step 1: Select Category -->
