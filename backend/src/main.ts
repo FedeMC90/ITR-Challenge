@@ -9,14 +9,11 @@ async function bootstrap() {
   // Get ConfigService instance to access environment variables
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port');
+  const corsOrigins = configService.get<string[]>('corsOrigins');
 
-  // Enable CORS to allow Angular frontend requests
+  // Enable CORS to allow frontend requests (development and production)
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:4200', // Angular CLI default port
-      'http://localhost:4201', // Angular CLI fallback port
-    ],
+    origin: corsOrigins,
     credentials: true,
   });
 
@@ -28,5 +25,6 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/api`);
+  console.log(`CORS enabled for: ${corsOrigins.join(', ')}`);
 }
 bootstrap();
