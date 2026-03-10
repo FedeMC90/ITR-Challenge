@@ -15,17 +15,20 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="!loading && products.length === 0" class="empty">
-    <p>No active products available at the moment.</p>
+    <p>No products available at the moment.</p>
     <p class="hint">
       Run the seeder to populate products: <code>npm run seed:run</code>
     </p>
   </div>
 
   <div class="products-grid" *ngIf="products.length > 0">
-    <div class="product-card" *ngFor="let product of products">
+    <div class="product-card" *ngFor="let product of products" [class.inactive]="!product.isActive">
       <div class="product-header">
         <h3>{{ product.title }}</h3>
         <span class="product-code">{{ product.code }}</span>
+        <span class="status-badge" [class.active]="product.isActive" [class.inactive-badge]="!product.isActive">
+          {{ product.isActive ? 'Active' : 'Inactive' }}
+        </span>
       </div>
       <p class="product-description">
         {{ product.description || 'No description available' }}

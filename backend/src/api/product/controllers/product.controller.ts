@@ -21,7 +21,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   /**
-   * List all active products with pagination
+   * List all products with pagination
    * GET /api/product?page=1&limit=10
    * Public endpoint - no authentication required (standard e-commerce behavior)
    */

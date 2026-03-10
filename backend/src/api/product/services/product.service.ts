@@ -21,8 +21,8 @@ export class ProductService {
   ) {}
 
   /**
-   * Retrieve paginated list of active products
-   * Returns only products that are marked as active (no drafts/inactive items)
+   * Retrieve paginated list of all products
+   * Returns all products (active and inactive)
    * Ordered by newest first
    */
   async getProducts(query: PaginationQueryDto) {
@@ -31,7 +31,6 @@ export class ProductService {
 
     // findAndCount returns [data, total]
     const [products, total] = await this.entityManager.findAndCount(Product, {
-      where: { isActive: true },
       skip,
       take: limit, // Limit number of results
       order: { createdAt: 'DESC' }, // Show newest products first
