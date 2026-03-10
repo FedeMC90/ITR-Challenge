@@ -4,6 +4,7 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { CreateProductComponent } from './components/create-product/create-product.component';
 import { CreateOrderComponent } from './components/create-order/create-order.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
+import { ManageRolesComponent } from './components/manage-roles/manage-roles.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'create-product', component: CreateProductComponent },
   { path: 'create-order', component: CreateOrderComponent },
   { path: 'orders', component: OrderListComponent },
+  { path: 'manage-roles', component: ManageRolesComponent },
   { path: '**', redirectTo: '/products' },
 ];

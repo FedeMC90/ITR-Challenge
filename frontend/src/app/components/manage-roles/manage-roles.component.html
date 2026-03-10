@@ -1,0 +1,73 @@
+<div class="manage-roles-container">
+  <h2>Manage User Roles</h2>
+
+  <div *ngIf="loading" class="loading">Loading users and roles...</div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="success" class="success">{{ success }}</div>
+
+  <div class="roles-manager" *ngIf="!loading">
+    <!-- User List -->
+    <div class="user-list-section">
+      <h3>Select User</h3>
+
+      <div *ngIf="users.length === 0" class="empty">
+        No users found in the system.
+      </div>
+
+      <div class="user-list" *ngIf="users.length > 0">
+        <div
+          class="user-item"
+          *ngFor="let user of users"
+          [class.selected]="selectedUser?.id === user.id"
+          (click)="selectUser(user)"
+        >
+          <div class="user-info">
+            <strong>{{ user.email }}</strong>
+            <span class="user-name" *ngIf="user.firstName || user.lastName">
+              {{ user.firstName }} {{ user.lastName }}
+            </span>
+            <span class="user-roles">{{ getRoleNames(user) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Role Assignment -->
+    <div class="role-assignment-section">
+      <h3>Assign/Remove Roles</h3>
+
+      <div *ngIf="!selectedUser" class="empty">
+        Select a user from the left to manage their roles.
+      </div>
+
+      <div *ngIf="selectedUser" class="role-assignment">
+        <div class="selected-user-info">
+          <h4>{{ selectedUser.email }}</h4>
+          <p *ngIf="selectedUser.firstName || selectedUser.lastName">
+            {{ selectedUser.firstName }} {{ selectedUser.lastName }}
+          </p>
+        </div>
+
+        <div class="roles-grid">
+          <div
+            class="role-card"
+            *ngFor="let role of roles"
+            [class.active]="hasRole(role.id)"
+          >
+            <div class="role-info">
+              <strong>{{ role.name }}</strong>
+            </div>
+            <button
+              class="btn-toggle"
+              [class.assigned]="hasRole(role.id)"
+              (click)="toggleRole(role.id)"
+            >
+              {{ hasRole(role.id) ? 'Remove' : 'Assign' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
