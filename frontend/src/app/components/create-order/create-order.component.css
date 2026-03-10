@@ -85,6 +85,17 @@ h3 {
   background-color: #f5f5f5;
 }
 
+.product-item.inactive {
+  opacity: 0.6;
+  background-color: #fafafa;
+  border-color: #bdbdbd;
+}
+
+.product-item.inactive:hover {
+  background-color: #fafafa;
+  cursor: not-allowed;
+}
+
 .product-info {
   display: flex;
   flex-direction: column;
@@ -107,8 +118,14 @@ h3 {
   transition: background-color 0.2s;
 }
 
-.btn-add:hover {
+.btn-add:hover:not(:disabled) {
   background-color: #1565c0;
+}
+
+.btn-add:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .order-items {
@@ -204,4 +221,18 @@ h3 {
 .btn-submit:disabled {
   background-color: #bdbdbd;
   cursor: not-allowed;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.inactive {
+  background-color: #ffebee;
+  color: #c62828;
 }

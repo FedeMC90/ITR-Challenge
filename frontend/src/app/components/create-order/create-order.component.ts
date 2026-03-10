@@ -38,7 +38,10 @@ export class CreateOrderComponent implements OnInit {
     this.productService.getProducts(1, 100).subscribe({
       next: (response) => {
         if (response.isSuccess) {
-          this.availableProducts = response.data.data;
+          // Sort products: active first, inactive last
+          this.availableProducts = response.data.data.sort(
+            (a, b) => Number(b.isActive) - Number(a.isActive),
+          );
         }
         this.loadingProducts = false;
       },
@@ -50,6 +53,12 @@ export class CreateOrderComponent implements OnInit {
   }
 
   addProduct(product: Product) {
+    // Prevent adding inactive products
+    if (!product.isActive) {
+      console.warn('Cannot add inactive product:', product.title);
+      return;
+    }
+
     const existing = this.orderItems.find(
       (item) => item.product.id === product.id,
     );
