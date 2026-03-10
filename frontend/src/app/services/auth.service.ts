@@ -69,6 +69,13 @@ export class AuthService {
       );
   }
 
+  register(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${environment.apiUrl}/auth/register`,
+      credentials,
+    );
+  }
+
   logout(): void {
     this.clearStorage();
     this.userSubject.next(null);
