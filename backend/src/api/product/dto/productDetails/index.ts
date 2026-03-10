@@ -2,14 +2,17 @@ import { BadRequestException } from '@nestjs/common';
 import { TypeHelpOptions } from 'class-transformer';
 import { Categories } from 'src/database/entities/category.entity';
 import { ComputerDetails } from './computer.details';
+import { FashionDetails } from './fashion.details';
 import { TestDetails } from './test.details';
 
-export type ProductDetails = ComputerDetails | TestDetails;
+export type ProductDetails = ComputerDetails | FashionDetails | TestDetails;
 
 export function ProductDetailsTypeFn(options: TypeHelpOptions) {
   switch (options.object?.details?.category) {
     case Categories.Computers:
       return ComputerDetails;
+    case Categories.Fashion:
+      return FashionDetails;
     case 'Test':
       return TestDetails;
   }

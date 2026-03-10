@@ -1,0 +1,283 @@
+<div class="create-product-container">
+  <div class="header">
+    <h2>Create New Product</h2>
+    <div class="steps">
+      <span class="step" [class.active]="step === 1">1. Category</span>
+      <span class="step" [class.active]="step === 2">2. Details</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">
+    Product created successfully! Redirecting...
+  </div>
+
+  <!-- Step 1: Select Category -->
+  <div class="form-section" *ngIf="step === 1">
+    <h3>Select Product Category</h3>
+    <div class="form-group">
+      <label for="category">Category *</label>
+      <select
+        id="category"
+        [(ngModel)]="form.categoryId"
+        class="form-control"
+        [disabled]="loading"
+      >
+        <option *ngFor="let cat of categories" [ngValue]="cat.id">
+          {{ cat.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="button-group">
+      <button class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="createBasicProduct()"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Creating...' : 'Next' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Product Details -->
+  <div class="form-section" *ngIf="step === 2 && productId">
+    <h3>Product Information</h3>
+
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input
+        type="text"
+        id="title"
+        [(ngModel)]="form.title"
+        class="form-control"
+        placeholder="e.g., MacBook Pro 14-inch"
+        [disabled]="loading"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="code">Product Code *</label>
+      <input
+        type="text"
+        id="code"
+        [(ngModel)]="form.code"
+        class="form-control"
+        placeholder="e.g., MBP-14-M3"
+        [disabled]="loading"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description *</label>
+      <textarea
+        id="description"
+        [(ngModel)]="form.description"
+        class="form-control"
+        rows="4"
+        placeholder="Enter product description..."
+        [disabled]="loading"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="variationType">Variation Type *</label>
+      <select
+        id="variationType"
+        [(ngModel)]="form.variationType"
+        class="form-control"
+        [disabled]="loading"
+      >
+        <option *ngFor="let type of variationTypes" [value]="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>About (Features) *</label>
+      <div class="about-list">
+        <div
+          class="about-item"
+          *ngFor="let item of form.about; let i = index; trackBy: trackByIndex"
+        >
+          <input
+            type="text"
+            [(ngModel)]="form.about[i]"
+            class="form-control"
+            placeholder="e.g., M3 Pro chip with 11-core CPU"
+            [disabled]="loading"
+          />
+          <button
+            type="button"
+            class="btn-remove"
+            (click)="removeAboutField(i)"
+            [disabled]="form.about.length === 1 || loading"
+          >
+            ×
+          </button>
+        </div>
+        <button
+          type="button"
+          class="btn btn-secondary btn-small"
+          (click)="addAboutField()"
+          [disabled]="loading"
+        >
+          + Add Feature
+        </button>
+      </div>
+    </div>
+
+    <!-- Computer-specific fields -->
+    <div *ngIf="form.categoryId === 1" class="category-specific-section">
+      <h4>Computer Specifications</h4>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="capacity">Storage Capacity *</label>
+          <input
+            type="number"
+            id="capacity"
+            [(ngModel)]="form.capacity"
+            class="form-control"
+            placeholder="e.g., 512"
+            [disabled]="loading"
+            min="1"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="capacityUnit">Unit *</label>
+          <select
+            id="capacityUnit"
+            [(ngModel)]="form.capacityUnit"
+            class="form-control"
+            [disabled]="loading"
+          >
+            <option *ngFor="let unit of capacityUnits" [value]="unit">
+              {{ unit }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="capacityType">Storage Type *</label>
+          <select
+            id="capacityType"
+            [(ngModel)]="form.capacityType"
+            class="form-control"
+            [disabled]="loading"
+          >
+            <option *ngFor="let type of capacityTypes" [value]="type">
+              {{ type }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="computerBrand">Brand *</label>
+        <input
+          type="text"
+          id="computerBrand"
+          [(ngModel)]="form.computerBrand"
+          class="form-control"
+          placeholder="e.g., Apple, Dell, HP"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="series">Series *</label>
+        <input
+          type="text"
+          id="series"
+          [(ngModel)]="form.series"
+          class="form-control"
+          placeholder="e.g., MacBook Pro, Inspiron"
+          [disabled]="loading"
+        />
+      </div>
+    </div>
+
+    <!-- Fashion-specific fields -->
+    <div *ngIf="form.categoryId === 2" class="category-specific-section">
+      <h4>Fashion Details</h4>
+
+      <div class="form-group">
+        <label for="material">Material *</label>
+        <input
+          type="text"
+          id="material"
+          [(ngModel)]="form.material"
+          class="form-control"
+          placeholder="e.g., Cotton, Polyester, Leather"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="fashionBrand">Brand *</label>
+        <input
+          type="text"
+          id="fashionBrand"
+          [(ngModel)]="form.fashionBrand"
+          class="form-control"
+          placeholder="e.g., Nike, Adidas, Zara"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="size">Size *</label>
+          <select
+            id="size"
+            [(ngModel)]="form.size"
+            class="form-control"
+            [disabled]="loading"
+          >
+            <option *ngFor="let s of fashionSizes" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="season">Season *</label>
+          <input
+            type="text"
+            id="season"
+            [(ngModel)]="form.season"
+            class="form-control"
+            placeholder="e.g., Spring/Summer 2026"
+            [disabled]="loading"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+      <button
+        class="btn btn-secondary"
+        (click)="goBackToStep1()"
+        [disabled]="loading"
+      >
+        Back
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="addProductDetails()"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Saving...' : 'Create Product' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,14 @@
 <div class="product-list-container">
-  <h2>Available Products</h2>
+  <div class="header">
+    <h2>Available Products</h2>
+    <button
+      class="btn-create"
+      (click)="navigateToCreate()"
+      *ngIf="isAuthenticated$ | async"
+    >
+      + Create Product
+    </button>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading products...</div>
 
@@ -19,7 +28,7 @@
         <span class="product-code">{{ product.code }}</span>
       </div>
       <p class="product-description">
-        {{ product.description || "No description available" }}
+        {{ product.description || 'No description available' }}
       </p>
       <div class="product-footer">
         <span class="variation-type">{{ product.variationType }}</span>
@@ -28,7 +37,7 @@
           (click)="addToOrder(product)"
           [disabled]="!(isAuthenticated$ | async)"
         >
-          {{ (isAuthenticated$ | async) ? "Add to Order" : "Login to Order" }}
+          {{ (isAuthenticated$ | async) ? 'Add to Order' : 'Login to Order' }}
         </button>
       </div>
     </div>

@@ -25,6 +25,28 @@ export interface ProductResponse {
   };
 }
 
+export interface ProductCreateResponse {
+  isSuccess: boolean;
+  data: {
+    id: number;
+    categoryId: number;
+  };
+}
+
+export interface ProductDetailsResponse {
+  isSuccess: boolean;
+  data: Product;
+}
+
+export interface ProductDetailsPayload {
+  title: string;
+  code: string;
+  description: string;
+  variationType: string;
+  about: string[];
+  details: any;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -37,6 +59,30 @@ export class ProductService {
   ): Observable<ProductResponse> {
     return this.http.get<ProductResponse>(
       `${environment.apiUrl}/product?page=${page}&limit=${limit}`,
+    );
+  }
+
+  createProduct(categoryId: number): Observable<ProductCreateResponse> {
+    return this.http.post<ProductCreateResponse>(
+      `${environment.apiUrl}/product/create`,
+      { categoryId },
+    );
+  }
+
+  addProductDetails(
+    productId: number,
+    details: ProductDetailsPayload,
+  ): Observable<ProductDetailsResponse> {
+    return this.http.post<ProductDetailsResponse>(
+      `${environment.apiUrl}/product/${productId}/details`,
+      details,
+    );
+  }
+
+  activateProduct(productId: number): Observable<ProductDetailsResponse> {
+    return this.http.post<ProductDetailsResponse>(
+      `${environment.apiUrl}/product/${productId}/activate`,
+      {},
     );
   }
 }
