@@ -3,5 +3,5 @@ export const environment = {
   // Update this URL after deploying your backend to Render
   // Format: https://your-backend-service-name.onrender.com/api
   // Example: https://ecommerce-api-xyz.onrender.com/api
-  apiUrl: 'https://your-backend-name.onrender.com/api',
+  apiUrl: 'https://ecommerce-back-azdg.onrender.com/api'
 };
