@@ -1,0 +1,33 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family:
+		-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+		'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+	min-height: 100vh;
+	background-color: #f7fafc;
+}
+
+.main-content {
+	min-height: calc(100vh - 60px);
+}
+
+.loading,
+.error {
+	text-align: center;
+	padding: 40px;
+	font-size: 18px;
+}
+
+.error {
+	color: #e53e3e;
+}

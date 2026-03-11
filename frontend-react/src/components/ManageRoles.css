@@ -1,0 +1,159 @@
+.manage-roles-container {
+	padding: 30px;
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+.manage-roles-container h2 {
+	color: #2d3748;
+	margin-bottom: 30px;
+}
+
+.roles-layout {
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	gap: 30px;
+}
+
+.users-panel,
+.roles-panel {
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.users-panel h3,
+.roles-panel h3 {
+	color: #2d3748;
+	margin-bottom: 20px;
+}
+
+.users-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.user-item {
+	padding: 15px;
+	border: 2px solid #e2e8f0;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.user-item:hover {
+	background-color: #f7fafc;
+	border-color: #cbd5e0;
+}
+
+.user-item.selected {
+	background-color: #ebf4ff;
+	border-color: #667eea;
+}
+
+.user-item strong {
+	display: block;
+	color: #2d3748;
+	margin-bottom: 8px;
+}
+
+.user-roles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+
+.role-badge {
+	display: inline-block;
+	background-color: #e6fffa;
+	color: #234e52;
+	padding: 3px 10px;
+	border-radius: 10px;
+	font-size: 12px;
+}
+
+.select-user-message {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 300px;
+}
+
+.select-user-message p {
+	color: #718096;
+	font-size: 16px;
+}
+
+.roles-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.role-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	border: 1px solid #e2e8f0;
+	border-radius: 5px;
+}
+
+.role-info {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.role-info strong {
+	color: #2d3748;
+	font-size: 16px;
+}
+
+.role-info span {
+	font-size: 14px;
+}
+
+.role-info .assigned {
+	color: #38a169;
+}
+
+.role-info .not-assigned {
+	color: #718096;
+}
+
+.assign-btn,
+.remove-btn {
+	padding: 8px 20px;
+	border: none;
+	border-radius: 5px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.assign-btn {
+	background-color: #48bb78;
+	color: white;
+}
+
+.assign-btn:hover {
+	background-color: #38a169;
+}
+
+.remove-btn {
+	background-color: #e53e3e;
+	color: white;
+}
+
+.remove-btn:hover {
+	background-color: #c53030;
+}
+
+@media (max-width: 992px) {
+	.roles-layout {
+		grid-template-columns: 1fr;
+	}
+}
