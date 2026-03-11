@@ -162,6 +162,35 @@ const CreateProduct: React.FC = () => {
 		navigate('/products');
 	};
 
+	// Validate if all required fields are filled
+	const isFormValid = (): boolean => {
+		// Common required fields
+		if (!title.trim() || !code.trim() || !description.trim()) {
+			return false;
+		}
+
+		// At least one about item must have content
+		const hasValidAbout = about.some((item) => item.trim() !== '');
+		if (!hasValidAbout) {
+			return false;
+		}
+
+		// Category-specific validations
+		if (selectedCategoryId === 1) {
+			// Computers: brand, series, capacity required
+			if (!computerBrand.trim() || !series.trim() || !capacity || capacity <= 0) {
+				return false;
+			}
+		} else if (selectedCategoryId === 2) {
+			// Fashion: material, fashionBrand, season required
+			if (!material.trim() || !fashionBrand.trim() || !season.trim()) {
+				return false;
+			}
+		}
+
+		return true;
+	};
+
 	return (
 		<div className='create-product-container'>
 			<h2>Create Product</h2>
@@ -211,7 +240,7 @@ const CreateProduct: React.FC = () => {
 							className='product-form'
 						>
 							<div className='form-group'>
-								<label>Title</label>
+								<label>Title *</label>
 								<input
 									type='text'
 									value={title}
@@ -221,7 +250,7 @@ const CreateProduct: React.FC = () => {
 							</div>
 
 							<div className='form-group'>
-								<label>Code</label>
+								<label>Code *</label>
 								<input
 									type='text'
 									value={code}
@@ -231,16 +260,17 @@ const CreateProduct: React.FC = () => {
 							</div>
 
 							<div className='form-group'>
-								<label>Description</label>
+								<label>Description *</label>
 								<textarea
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
 									rows={4}
+									required
 								/>
 							</div>
 
 							<div className='form-group'>
-								<label>Variation Type</label>
+								<label>Variation Type *</label>
 								<select
 									value={variationType}
 									onChange={(e) => setVariationType(e.target.value)}
@@ -259,7 +289,7 @@ const CreateProduct: React.FC = () => {
 									<h3 style={{ marginTop: '20px', marginBottom: '15px', color: '#2d3748' }}>Computer Details</h3>
 
 									<div className='form-group'>
-										<label>Brand</label>
+										<label>Brand *</label>
 										<input
 											type='text'
 											value={computerBrand}
@@ -270,7 +300,7 @@ const CreateProduct: React.FC = () => {
 									</div>
 
 									<div className='form-group'>
-										<label>Series</label>
+										<label>Series *</label>
 										<input
 											type='text'
 											value={series}
@@ -282,17 +312,18 @@ const CreateProduct: React.FC = () => {
 
 									<div className='form-row'>
 										<div className='form-group'>
-											<label>Capacity</label>
+											<label>Capacity *</label>
 											<input
 												type='number'
 												value={capacity}
 												onChange={(e) => setCapacity(Number(e.target.value))}
+												min='1'
 												required
 											/>
 										</div>
 
 										<div className='form-group'>
-											<label>Unit</label>
+											<label>Unit *</label>
 											<select
 												value={capacityUnit}
 												onChange={(e) => setCapacityUnit(e.target.value as 'GB' | 'TB')}
@@ -304,7 +335,7 @@ const CreateProduct: React.FC = () => {
 										</div>
 
 										<div className='form-group'>
-											<label>Type</label>
+											<label>Type *</label>
 											<select
 												value={capacityType}
 												onChange={(e) => setCapacityType(e.target.value as 'SSD' | 'HD')}
@@ -323,7 +354,7 @@ const CreateProduct: React.FC = () => {
 									<h3 style={{ marginTop: '20px', marginBottom: '15px', color: '#2d3748' }}>Fashion Details</h3>
 
 									<div className='form-group'>
-										<label>Material</label>
+										<label>Material *</label>
 										<input
 											type='text'
 											value={material}
@@ -334,7 +365,7 @@ const CreateProduct: React.FC = () => {
 									</div>
 
 									<div className='form-group'>
-										<label>Brand</label>
+										<label>Brand *</label>
 										<input
 											type='text'
 											value={fashionBrand}
@@ -346,7 +377,7 @@ const CreateProduct: React.FC = () => {
 
 									<div className='form-row'>
 										<div className='form-group'>
-											<label>Size</label>
+											<label>Size *</label>
 											<select
 												value={size}
 												onChange={(e) => setSize(e.target.value as 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL')}
@@ -362,7 +393,7 @@ const CreateProduct: React.FC = () => {
 										</div>
 
 										<div className='form-group'>
-											<label>Season</label>
+											<label>Season *</label>
 											<input
 												type='text'
 												value={season}
@@ -376,7 +407,7 @@ const CreateProduct: React.FC = () => {
 							)}
 
 							<div className='form-group'>
-								<label>About (one per line)</label>
+								<label>About (at least one required) *</label>
 								{about.map((item, index) => (
 									<div
 										key={index}
@@ -419,7 +450,7 @@ const CreateProduct: React.FC = () => {
 								<button
 									type='submit'
 									className='submit-button'
-									disabled={loading}
+									disabled={loading || !isFormValid()}
 								>
 									{loading ? 'Creating...' : 'Create Product'}
 								</button>
@@ -439,13 +470,13 @@ const CreateProduct: React.FC = () => {
 									className='back-button'
 									onClick={handleContinueWithoutActivating}
 								>
-									Continuar sin activar
+									Continue without activating
 								</button>
 								<button
 									onClick={handleActivateProduct}
 									className='activate-button'
 								>
-									Activate Product
+									Activate product
 								</button>
 							</div>
 						</div>
