@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { productService } from '../services/productService';
+import { useAuth } from '../hooks/useAuth';
 import type { Product } from '../types';
 import './ProductList.css';
 
@@ -7,6 +8,7 @@ const ProductList: React.FC = () => {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const { isAdmin } = useAuth();
 
 	useEffect(() => {
 		loadProducts();
@@ -80,12 +82,14 @@ const ProductList: React.FC = () => {
 								</p>
 							</div>
 
-							<button
-								onClick={() => handleToggleStatus(product.id)}
-								className='toggle-button'
-							>
-								{product.isActive ? 'Deactivate' : 'Activate'}
-							</button>
+							{isAdmin() && (
+								<button
+									onClick={() => handleToggleStatus(product.id)}
+									className='toggle-button'
+								>
+									{product.isActive ? 'Deactivate' : 'Activate'}
+								</button>
+							)}
 						</div>
 					))}
 				</div>
