@@ -22,9 +22,11 @@ const ManageRoles: React.FC = () => {
 			setUsers(usersData);
 			setRoles(rolesData);
 			setError('');
+			return usersData; // Return the updated users
 		} catch (err: unknown) {
 			setError('Failed to load data');
 			console.error('Failed to load data:', err);
+			return []; // Return empty array on error
 		} finally {
 			setLoading(false);
 		}
@@ -42,11 +44,11 @@ const ManageRoles: React.FC = () => {
 				await roleService.assignRole({ userId: selectedUser.id, roleId });
 			}
 
-			// Reload data after successful toggle
-			await loadData();
+			// Reload data after successful toggle and get updated users
+			const updatedUsers = await loadData();
 
-			// Update selected user with new data
-			const updatedUser = users.find((u) => u.id === selectedUser.id);
+			// Update selected user with new data from the fresh data
+			const updatedUser = updatedUsers.find((u) => u.id === selectedUser.id);
 			if (updatedUser) {
 				setSelectedUser(updatedUser);
 			}
