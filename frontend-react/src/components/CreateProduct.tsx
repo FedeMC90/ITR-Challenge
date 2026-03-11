@@ -57,67 +57,67 @@ const CreateProduct: React.FC = () => {
 		}
 	};
 
-	const handleCreateProduct = async (e: React.FormEvent) => {
+	const handleSelectCategory = (e: React.FormEvent) => {
 		e.preventDefault();
 		setError('');
 		setSuccess('');
 
-		try {
-			const catId = Number(categoryId);
-			const response = await productService.createProduct(catId);
-			if (response.isSuccess) {
-				setProductId(response.data.id);
-				setSelectedCategoryId(catId); // Save selected category for step 2
-				setSuccess('Product created! Now add details.');
-				setStep(2);
-			}
-		} catch (err: unknown) {
-			if (err && typeof err === 'object' && 'response' in err) {
-				const axiosError = err as { response?: { data?: { message?: string } } };
-				setError(axiosError.response?.data?.message || 'Failed to create product');
-			} else {
-				setError('Failed to create product');
-			}
-		}
+		// Just save the selected category and move to step 2
+		const catId = Number(categoryId);
+		setSelectedCategoryId(catId);
+		setStep(2);
 	};
 
 	const handleAddDetails = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError('');
 		setSuccess('');
-
-		if (!productId) return;
-
-		// Build details object based on category
-		let details: ProductDetails;
-
-		if (selectedCategoryId === 1) {
-			// Computers
-			details = {
-				category: 'Computers',
-				capacity,
-				capacityUnit,
-				capacityType,
-				brand: computerBrand,
-				series,
-			} as ComputerDetails;
-		} else if (selectedCategoryId === 2) {
-			// Fashion
-			details = {
-				category: 'Fashion',
-				material,
-				brand: fashionBrand,
-				size,
-				season,
-			} as FashionDetails;
-		} else {
-			// Fallback (should not happen)
-			setError('Invalid category selected');
-			return;
-		}
+		setLoading(true);
 
 		try {
-			await productService.addProductDetails(productId, {
+			// First, create the product with the selected category
+			const createResponse = await productService.createProduct(selectedCategoryId);
+
+			if (!createResponse.isSuccess) {
+				setError('Failed to create product');
+				setLoading(false);
+				return;
+			}
+
+			const newProductId = createResponse.data.id;
+			setProductId(newProductId);
+
+			// Build details object based on category
+			let details: ProductDetails;
+
+			if (selectedCategoryId === 1) {
+				// Computers
+				details = {
+					category: 'Computers',
+					capacity,
+					capacityUnit,
+					capacityType,
+					brand: computerBrand,
+					series,
+				} as ComputerDetails;
+			} else if (selectedCategoryId === 2) {
+				// Fashion
+				details = {
+					category: 'Fashion',
+					material,
+					brand: fashionBrand,
+					size,
+					season,
+				} as FashionDetails;
+			} else {
+				// Fallback (should not happen)
+				setError('Invalid category selected');
+				setLoading(false);
+				return;
+			}
+
+			// Then, add details to the created product
+			await productService.addProductDetails(newProductId, {
 				title,
 				code,
 				description,
@@ -125,14 +125,17 @@ const CreateProduct: React.FC = () => {
 				about: about.filter((item) => item.trim() !== ''),
 				details,
 			});
-			setSuccess('Details added!');
+
+			setSuccess('Product created successfully!');
+			setLoading(false);
 			setStep(3);
 		} catch (err: unknown) {
+			setLoading(false);
 			if (err && typeof err === 'object' && 'response' in err) {
 				const axiosError = err as { response?: { data?: { message?: string } } };
-				setError(axiosError.response?.data?.message || 'Failed to add details');
+				setError(axiosError.response?.data?.message || 'Failed to create product');
 			} else {
-				setError('Failed to add details');
+				setError('Failed to create product');
 			}
 		}
 	};
@@ -154,6 +157,11 @@ const CreateProduct: React.FC = () => {
 		}
 	};
 
+	const handleContinueWithoutActivating = () => {
+		// Product remains inactive, redirect to products list
+		navigate('/products');
+	};
+
 	return (
 		<div className='create-product-container'>
 			<h2>Create Product</h2>
@@ -164,7 +172,7 @@ const CreateProduct: React.FC = () => {
 				<>
 					{step === 1 && (
 						<form
-							onSubmit={handleCreateProduct}
+							onSubmit={handleSelectCategory}
 							className='product-form'
 						>
 							<div className='form-group'>
@@ -192,7 +200,7 @@ const CreateProduct: React.FC = () => {
 								type='submit'
 								className='submit-button'
 							>
-								Create Product
+								Continue
 							</button>
 						</form>
 					)}
@@ -404,14 +412,16 @@ const CreateProduct: React.FC = () => {
 									type='button'
 									className='back-button'
 									onClick={() => setStep(1)}
+									disabled={loading}
 								>
 									Volver
 								</button>
 								<button
 									type='submit'
 									className='submit-button'
+									disabled={loading}
 								>
-									Add Details
+									{loading ? 'Creating...' : 'Create Product'}
 								</button>
 							</div>
 						</form>
@@ -419,14 +429,17 @@ const CreateProduct: React.FC = () => {
 
 					{step === 3 && (
 						<div className='activation-step'>
-							<p className='success-message'>Product details added successfully!</p>
+							<p className='success-message'>Product created successfully!</p>
+							<p style={{ color: '#4a5568', marginBottom: '20px' }}>
+								Do you want to activate the product now or continue without activating?
+							</p>
 							<div className='button-group'>
 								<button
 									type='button'
 									className='back-button'
-									onClick={() => setStep(2)}
+									onClick={handleContinueWithoutActivating}
 								>
-									Volver
+									Continuar sin activar
 								</button>
 								<button
 									onClick={handleActivateProduct}
