@@ -69,13 +69,32 @@ export interface ProductCreateResponse {
 	};
 }
 
+export interface ComputerDetails {
+	category: 'Computers';
+	capacity: number;
+	capacityUnit: 'GB' | 'TB';
+	capacityType: 'SSD' | 'HD';
+	brand: string;
+	series: string;
+}
+
+export interface FashionDetails {
+	category: 'Fashion';
+	material: string;
+	brand: string;
+	size: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+	season: string;
+}
+
+export type ProductDetails = ComputerDetails | FashionDetails;
+
 export interface ProductDetailsPayload {
 	title: string;
 	code: string;
 	description: string;
 	variationType: string;
 	about: string[];
-	details: Record<string, unknown>;
+	details: ProductDetails;
 }
 
 // Order Types

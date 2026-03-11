@@ -2,17 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
-import type { Category } from '../types';
+import type { Category, ComputerDetails, FashionDetails, ProductDetails } from '../types';
 import './CreateProduct.css';
 
 const CreateProduct: React.FC = () => {
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [categoryId, setCategoryId] = useState('1');
+	const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
 	const [productId, setProductId] = useState<number | null>(null);
+
+	// Basic fields
 	const [title, setTitle] = useState('');
 	const [code, setCode] = useState('');
 	const [description, setDescription] = useState('');
-	const [variationType, setVariationType] = useState('');
+	const [variationType, setVariationType] = useState('NONE');
+	const [about, setAbout] = useState<string[]>(['']);
+
+	// Computer-specific fields
+	const [capacity, setCapacity] = useState(512);
+	const [capacityUnit, setCapacityUnit] = useState<'GB' | 'TB'>('GB');
+	const [capacityType, setCapacityType] = useState<'SSD' | 'HD'>('SSD');
+	const [computerBrand, setComputerBrand] = useState('');
+	const [series, setSeries] = useState('');
+
+	// Fashion-specific fields
+	const [material, setMaterial] = useState('');
+	const [fashionBrand, setFashionBrand] = useState('');
+	const [size, setSize] = useState<'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'>('M');
+	const [season, setSeason] = useState('');
+
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
 	const [step, setStep] = useState(1);
@@ -45,9 +63,11 @@ const CreateProduct: React.FC = () => {
 		setSuccess('');
 
 		try {
-			const response = await productService.createProduct(Number(categoryId));
+			const catId = Number(categoryId);
+			const response = await productService.createProduct(catId);
 			if (response.isSuccess) {
 				setProductId(response.data.id);
+				setSelectedCategoryId(catId); // Save selected category for step 2
 				setSuccess('Product created! Now add details.');
 				setStep(2);
 			}
@@ -68,14 +88,42 @@ const CreateProduct: React.FC = () => {
 
 		if (!productId) return;
 
+		// Build details object based on category
+		let details: ProductDetails;
+
+		if (selectedCategoryId === 1) {
+			// Computers
+			details = {
+				category: 'Computers',
+				capacity,
+				capacityUnit,
+				capacityType,
+				brand: computerBrand,
+				series,
+			} as ComputerDetails;
+		} else if (selectedCategoryId === 2) {
+			// Fashion
+			details = {
+				category: 'Fashion',
+				material,
+				brand: fashionBrand,
+				size,
+				season,
+			} as FashionDetails;
+		} else {
+			// Fallback (should not happen)
+			setError('Invalid category selected');
+			return;
+		}
+
 		try {
 			await productService.addProductDetails(productId, {
 				title,
 				code,
 				description,
 				variationType,
-				about: [],
-				details: {},
+				about: about.filter((item) => item.trim() !== ''),
+				details,
 			});
 			setSuccess('Details added!');
 			setStep(3);
@@ -185,11 +233,167 @@ const CreateProduct: React.FC = () => {
 
 							<div className='form-group'>
 								<label>Variation Type</label>
-								<input
-									type='text'
+								<select
 									value={variationType}
 									onChange={(e) => setVariationType(e.target.value)}
-								/>
+									required
+								>
+									<option value='NONE'>No Variation</option>
+									<option value='OnlySize'>Size Only</option>
+									<option value='OnlyColor'>Color Only</option>
+									<option value='SizeAndColor'>Size and Color</option>
+								</select>
+							</div>
+
+							{/* Category-specific fields */}
+							{selectedCategoryId === 1 && (
+								<>
+									<h3 style={{ marginTop: '20px', marginBottom: '15px', color: '#2d3748' }}>Computer Details</h3>
+
+									<div className='form-group'>
+										<label>Brand</label>
+										<input
+											type='text'
+											value={computerBrand}
+											onChange={(e) => setComputerBrand(e.target.value)}
+											placeholder='e.g., Dell, HP, Apple'
+											required
+										/>
+									</div>
+
+									<div className='form-group'>
+										<label>Series</label>
+										<input
+											type='text'
+											value={series}
+											onChange={(e) => setSeries(e.target.value)}
+											placeholder='e.g., XPS, Pavilion, MacBook'
+											required
+										/>
+									</div>
+
+									<div className='form-row'>
+										<div className='form-group'>
+											<label>Capacity</label>
+											<input
+												type='number'
+												value={capacity}
+												onChange={(e) => setCapacity(Number(e.target.value))}
+												required
+											/>
+										</div>
+
+										<div className='form-group'>
+											<label>Unit</label>
+											<select
+												value={capacityUnit}
+												onChange={(e) => setCapacityUnit(e.target.value as 'GB' | 'TB')}
+												required
+											>
+												<option value='GB'>GB</option>
+												<option value='TB'>TB</option>
+											</select>
+										</div>
+
+										<div className='form-group'>
+											<label>Type</label>
+											<select
+												value={capacityType}
+												onChange={(e) => setCapacityType(e.target.value as 'SSD' | 'HD')}
+												required
+											>
+												<option value='SSD'>SSD</option>
+												<option value='HD'>HD</option>
+											</select>
+										</div>
+									</div>
+								</>
+							)}
+
+							{selectedCategoryId === 2 && (
+								<>
+									<h3 style={{ marginTop: '20px', marginBottom: '15px', color: '#2d3748' }}>Fashion Details</h3>
+
+									<div className='form-group'>
+										<label>Material</label>
+										<input
+											type='text'
+											value={material}
+											onChange={(e) => setMaterial(e.target.value)}
+											placeholder='e.g., Cotton, Polyester, Leather'
+											required
+										/>
+									</div>
+
+									<div className='form-group'>
+										<label>Brand</label>
+										<input
+											type='text'
+											value={fashionBrand}
+											onChange={(e) => setFashionBrand(e.target.value)}
+											placeholder='e.g., Nike, Adidas, Zara'
+											required
+										/>
+									</div>
+
+									<div className='form-row'>
+										<div className='form-group'>
+											<label>Size</label>
+											<select
+												value={size}
+												onChange={(e) => setSize(e.target.value as 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL')}
+												required
+											>
+												<option value='XS'>XS</option>
+												<option value='S'>S</option>
+												<option value='M'>M</option>
+												<option value='L'>L</option>
+												<option value='XL'>XL</option>
+												<option value='XXL'>XXL</option>
+											</select>
+										</div>
+
+										<div className='form-group'>
+											<label>Season</label>
+											<input
+												type='text'
+												value={season}
+												onChange={(e) => setSeason(e.target.value)}
+												placeholder='e.g., Spring/Summer 2026'
+												required
+											/>
+										</div>
+									</div>
+								</>
+							)}
+
+							<div className='form-group'>
+								<label>About (one per line)</label>
+								{about.map((item, index) => (
+									<div
+										key={index}
+										style={{ marginBottom: '8px' }}
+									>
+										<input
+											type='text'
+											value={item}
+											onChange={(e) => {
+												const newAbout = [...about];
+												newAbout[index] = e.target.value;
+												setAbout(newAbout);
+											}}
+											placeholder={`Point ${index + 1}`}
+										/>
+									</div>
+								))}
+								<button
+									type='button'
+									className='back-button'
+									onClick={() => setAbout([...about, ''])}
+									style={{ marginTop: '8px' }}
+								>
+									+ Add Point
+								</button>
 							</div>
 
 							{error && <div className='error-message'>{error}</div>}
