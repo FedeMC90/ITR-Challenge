@@ -72,7 +72,7 @@ const OrderList: React.FC = () => {
 
 							<div className='order-info'>
 								<p>
-									<strong>Total:</strong> ${order.totalAmount.toFixed(2)}
+									<strong>Total:</strong> ${Number(order.totalAmount).toFixed(2)}
 								</p>
 								<p>
 									<strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
@@ -86,7 +86,7 @@ const OrderList: React.FC = () => {
 										{order.items.map((item) => (
 											<li key={item.id}>
 												{item.product?.title || `Product #${item.productId}`} - Qty: {item.quantity} - $
-												{item.price.toFixed(2)}
+												{Number(item.price).toFixed(2)}
 											</li>
 										))}
 									</ul>

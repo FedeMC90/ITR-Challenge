@@ -121,14 +121,14 @@ export interface OrderItem {
 	id: number;
 	productId: number;
 	quantity: number;
-	price: number;
+	price: number | string; // Backend returns DECIMAL as string
 	product: Product;
 }
 
 export interface Order {
 	id: number;
 	userId: number;
-	totalAmount: number;
+	totalAmount: number | string; // Backend returns DECIMAL as string
 	status: string;
 	createdAt: string;
 	items: OrderItem[];
