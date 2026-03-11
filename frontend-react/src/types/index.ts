@@ -29,6 +29,16 @@ export interface AuthResponse {
 }
 
 // Product Types
+export interface Category {
+	id: number;
+	name: string;
+}
+
+export interface CategoryListResponse {
+	isSuccess: boolean;
+	data: Category[];
+}
+
 export interface Product {
 	id: number;
 	code: string;

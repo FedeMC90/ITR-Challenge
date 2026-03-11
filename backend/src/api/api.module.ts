@@ -7,6 +7,7 @@ import { RoleModule } from './role/role.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { CategoryModule } from './category/category.module';
 import { ErrorsFilter } from 'src/errors/errors.filter';
 
 @Module({
@@ -17,6 +18,7 @@ import { ErrorsFilter } from 'src/errors/errors.filter';
     ProductModule,
     OrderModule,
     InventoryModule,
+    CategoryModule,
   ],
   providers: [
     {

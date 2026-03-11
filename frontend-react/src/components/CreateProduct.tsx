@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
+import { categoryService } from '../services/categoryService';
+import type { Category } from '../types';
 import './CreateProduct.css';
 
 const CreateProduct: React.FC = () => {
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [categoryId, setCategoryId] = useState('1');
 	const [productId, setProductId] = useState<number | null>(null);
 	const [title, setTitle] = useState('');
@@ -13,8 +16,28 @@ const CreateProduct: React.FC = () => {
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
 	const [step, setStep] = useState(1);
+	const [loading, setLoading] = useState(true);
 
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		loadCategories();
+	}, []);
+
+	const loadCategories = async () => {
+		try {
+			const response = await categoryService.getAllCategories();
+			if (response.isSuccess && response.data.length > 0) {
+				setCategories(response.data);
+				setCategoryId(response.data[0].id.toString());
+			}
+		} catch (err: unknown) {
+			console.error('Failed to load categories:', err);
+			setError('Failed to load categories');
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const handleCreateProduct = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -87,98 +110,130 @@ const CreateProduct: React.FC = () => {
 		<div className='create-product-container'>
 			<h2>Create Product</h2>
 
-			{step === 1 && (
-				<form
-					onSubmit={handleCreateProduct}
-					className='product-form'
-				>
-					<div className='form-group'>
-						<label>Category ID</label>
-						<input
-							type='number'
-							value={categoryId}
-							onChange={(e) => setCategoryId(e.target.value)}
-							required
-						/>
-					</div>
+			{loading ? (
+				<div className='loading'>Loading categories...</div>
+			) : (
+				<>
+					{step === 1 && (
+						<form
+							onSubmit={handleCreateProduct}
+							className='product-form'
+						>
+							<div className='form-group'>
+								<label>Category</label>
+								<select
+									value={categoryId}
+									onChange={(e) => setCategoryId(e.target.value)}
+									required
+								>
+									{categories.map((category) => (
+										<option
+											key={category.id}
+											value={category.id}
+										>
+											{category.name}
+										</option>
+									))}
+								</select>
+							</div>
 
-					{error && <div className='error-message'>{error}</div>}
-					{success && <div className='success-message'>{success}</div>}
+							{error && <div className='error-message'>{error}</div>}
+							{success && <div className='success-message'>{success}</div>}
 
-					<button
-						type='submit'
-						className='submit-button'
-					>
-						Create Product
-					</button>
-				</form>
-			)}
+							<button
+								type='submit'
+								className='submit-button'
+							>
+								Create Product
+							</button>
+						</form>
+					)}
 
-			{step === 2 && (
-				<form
-					onSubmit={handleAddDetails}
-					className='product-form'
-				>
-					<div className='form-group'>
-						<label>Title</label>
-						<input
-							type='text'
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-							required
-						/>
-					</div>
+					{step === 2 && (
+						<form
+							onSubmit={handleAddDetails}
+							className='product-form'
+						>
+							<div className='form-group'>
+								<label>Title</label>
+								<input
+									type='text'
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									required
+								/>
+							</div>
 
-					<div className='form-group'>
-						<label>Code</label>
-						<input
-							type='text'
-							value={code}
-							onChange={(e) => setCode(e.target.value)}
-							required
-						/>
-					</div>
+							<div className='form-group'>
+								<label>Code</label>
+								<input
+									type='text'
+									value={code}
+									onChange={(e) => setCode(e.target.value)}
+									required
+								/>
+							</div>
 
-					<div className='form-group'>
-						<label>Description</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={4}
-						/>
-					</div>
+							<div className='form-group'>
+								<label>Description</label>
+								<textarea
+									value={description}
+									onChange={(e) => setDescription(e.target.value)}
+									rows={4}
+								/>
+							</div>
 
-					<div className='form-group'>
-						<label>Variation Type</label>
-						<input
-							type='text'
-							value={variationType}
-							onChange={(e) => setVariationType(e.target.value)}
-						/>
-					</div>
+							<div className='form-group'>
+								<label>Variation Type</label>
+								<input
+									type='text'
+									value={variationType}
+									onChange={(e) => setVariationType(e.target.value)}
+								/>
+							</div>
 
-					{error && <div className='error-message'>{error}</div>}
-					{success && <div className='success-message'>{success}</div>}
+							{error && <div className='error-message'>{error}</div>}
+							{success && <div className='success-message'>{success}</div>}
 
-					<button
-						type='submit'
-						className='submit-button'
-					>
-						Add Details
-					</button>
-				</form>
-			)}
+							<div className='button-group'>
+								<button
+									type='button'
+									className='back-button'
+									onClick={() => setStep(1)}
+								>
+									Volver
+								</button>
+								<button
+									type='submit'
+									className='submit-button'
+								>
+									Add Details
+								</button>
+							</div>
+						</form>
+					)}
 
-			{step === 3 && (
-				<div className='activation-step'>
-					<p className='success-message'>Product details added successfully!</p>
-					<button
-						onClick={handleActivateProduct}
-						className='activate-button'
-					>
-						Activate Product
-					</button>
-				</div>
+					{step === 3 && (
+						<div className='activation-step'>
+							<p className='success-message'>Product details added successfully!</p>
+							<div className='button-group'>
+								<button
+									type='button'
+									className='back-button'
+									onClick={() => setStep(2)}
+								>
+									Volver
+								</button>
+								<button
+									onClick={handleActivateProduct}
+									className='activate-button'
+								>
+									Activate Product
+								</button>
+							</div>
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);
