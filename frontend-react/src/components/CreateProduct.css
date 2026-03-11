@@ -1,0 +1,87 @@
+.create-product-container {
+	padding: 30px;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.create-product-container h2 {
+	color: #2d3748;
+	margin-bottom: 30px;
+}
+
+.product-form {
+	background: white;
+	padding: 30px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+	color: #2d3748;
+	font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #cbd5e0;
+	border-radius: 5px;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+	outline: none;
+	border-color: #667eea;
+}
+
+.submit-button,
+.activate-button {
+	width: 100%;
+	padding: 12px;
+	border: none;
+	border-radius: 5px;
+	background-color: #667eea;
+	color: white;
+	font-size: 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.submit-button:hover,
+.activate-button:hover {
+	background-color: #5568d3;
+}
+
+.activation-step {
+	background: white;
+	padding: 30px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	text-align: center;
+}
+
+.error-message {
+	color: #e53e3e;
+	background-color: #fff5f5;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+
+.success-message {
+	color: #38a169;
+	background-color: #f0fff4;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}

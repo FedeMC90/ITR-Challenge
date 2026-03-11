@@ -8,7 +8,8 @@
 
 ## Live Deployment
 
-🌐 **Frontend**: https://ecommerce-front-wmjg.onrender.com  
+🌐 **Frontend (React)**: https://itr-challenge.onrender.com
+🌐 **Frontend (Angular - Backup)**: https://ecommerce-front-wmjg.onrender.com  
 🔧 **Backend API**: https://ecommerce-back-azdg.onrender.com/api  
 📦 **Database**: PostgreSQL on Render
 
@@ -82,7 +83,52 @@
 
 ---
 
-### 5. Angular Frontend
+### 5. React Frontend (Primary)
+
+**Directory**: `frontend-react/`
+
+**Files Created**: Complete React 19 + TypeScript application with Vite:
+
+- `src/types/index.ts` → TypeScript interfaces (User, Product, Order, Role, API responses)
+- `src/config/axios.ts` → Axios client with JWT interceptors
+- `src/context/AuthContext.tsx` → Global authentication state (Context API)
+- `src/services/` → API layer (productService, orderService, userService, roleService)
+- `src/components/Login.tsx` → Login form with registration modal
+- `src/components/ProductList.tsx` → Product grid with active/inactive sorting and toggle
+- `src/components/CreateProduct.tsx` → 3-step product creation flow
+- `src/components/CreateOrder.tsx` → Two-panel order creation (products + cart)
+- `src/components/OrderList.tsx` → Order history with cancel functionality
+- `src/components/ManageRoles.tsx` → Admin-only role management interface
+- `src/components/ProtectedRoute.tsx` → Route guard with admin checking
+- `src/App.tsx` → Main routing configuration
+- `.env.production` → Production API URL configuration
+- `public/_redirects` → Render SPA routing configuration
+
+**Changes**:
+
+- ✅ **Functional Components + Hooks** → Modern React architecture (useState, useEffect, useContext)
+- ✅ **Context API for Auth** → Global state management without external libraries
+- ✅ **Axios with Interceptors** → JWT token injection, automatic 401 handling
+- ✅ **Protected Routes** → Authentication + role-based access control
+- ✅ **Complete Admin Features** → Product management, role assignment, user administration
+- ✅ **TypeScript Strict Mode** → Type-safe development with verbatimModuleSyntax
+- ✅ **Vite Build System** → Fast development (HMR), optimized production bundle (92 kB gzipped)
+- ✅ **Production-Ready** → Environment variables, \_redirects for SPA routing
+
+**Why**: Challenge requirements changed from Angular to React. Provides modern developer experience with functional components, hooks, and optimized build times.
+
+**Technology Stack**:
+
+- React 19.2.0 + React Router DOM 7.13.1
+- TypeScript 5.9.3 (strict mode)
+- Axios 1.13.6 (HTTP client)
+- Vite 7.3.1 (build tool)
+
+---
+
+### 6. Angular Frontend (Backup)
+
+**Directory**: `frontend/`
 
 **Files Created**: Complete Angular 17 standalone application with:
 
@@ -98,6 +144,8 @@
 - ✅ **Product browsing** → Paginated product list with inventory display
 - ✅ **Order creation** → Shopping cart → place orders → view order history
 - ✅ **Order cancellation** → Cancel orders → auto stock release
+
+**Status**: Kept as backup; original implementation before framework migration.
 
 **Why**: Demonstrates full-stack integration; validates backend API functionality.
 
@@ -201,7 +249,22 @@ npm run start:dev
 
 Backend running at: `http://localhost:3000/api`
 
-### 4. Frontend Setup
+### 4. Frontend Setup (React - Primary)
+
+```bash
+cd frontend-react
+npm install
+
+# Configure environment (frontend-react/.env)
+VITE_API_URL=http://localhost:3000/api
+
+# Start frontend
+npm run dev
+```
+
+Frontend running at: `http://localhost:5173`
+
+**Alternative: Angular Frontend (Backup)**
 
 ```bash
 cd frontend
@@ -229,25 +292,74 @@ Frontend running at: `http://localhost:4200`
 
 ---
 
-
 ## Technology Stack
 
-| Layer          | Technology    | Version |
-| -------------- | ------------- | ------- |
-| **Backend**    | NestJS        | 9.x     |
-|                | TypeORM       | 0.3.x   |
-|                | PostgreSQL    | 16      |
-|                | EventEmitter2 | 2.0.4   |
-| **Frontend**   | Angular       | 17.x    |
-|                | TypeScript    | 5.x     |
-|                | RxJS          | 7.x     |
-| **Deployment** | Render        | Cloud   |
+| Layer                  | Technology    | Version |
+| ---------------------- | ------------- | ------- |
+| **Backend**            | NestJS        | 9.x     |
+|                        | TypeORM       | 0.3.x   |
+|                        | PostgreSQL    | 16      |
+|                        | EventEmitter2 | 2.0.4   |
+| **Frontend (Primary)** | React         | 19.2.0  |
+|                        | Vite          | 7.3.1   |
+|                        | Axios         | 1.13.6  |
+|                        | React Router  | 7.13.1  |
+|                        | TypeScript    | 5.9.3   |
+| **Frontend (Backup)**  | Angular       | 17.x    |
+|                        | TypeScript    | 5.x     |
+|                        | RxJS          | 7.x     |
+| **Deployment**         | Render        | Cloud   |
 
 ---
 
 ## Project Status
 
-✅ **MVP Complete** - Full-stack event-driven e-commerce application  
+✅ **MVP Complete** - Full-stack event-driven e-commerce application
+
+---
+
+## Migration Notes
+
+### Angular → React Framework Migration
+
+**Date**: March 2026  
+**Reason**: Challenge requirements changed post-submission from Angular to React  
+**Approach**: Parallel development (kept Angular as backup)
+
+**Migration Details**:
+
+1. **Created New React Project** (`frontend-react/`)
+   - Vite + React 19 + TypeScript 5.9
+   - Migrated all 7 components maintaining feature parity
+   - Replaced Angular services with axios + Context API
+   - Production build: 284.52 kB (92.21 kB gzipped)
+
+2. **Component Mapping**:
+   - Login → Login.tsx (with registration modal)
+   - ProductList → ProductList.tsx (grid + toggle active/inactive)
+   - CreateProduct → CreateProduct.tsx (3-step flow)
+   - CreateOrder → CreateOrder.tsx (cart system)
+   - OrderList → OrderList.tsx (cancel functionality)
+   - ManageRoles → ManageRoles.tsx (Admin only)
+   - ProtectedRoute → Route guards with admin checking
+
+3. **State Management Migration**:
+   - Angular Services + RxJS → React Context API + useState/useEffect
+   - AuthService → AuthContext.tsx (login, register, logout, hasRole)
+   - Product/Order/User/Role Services → axios-based service functions
+
+4. **Build & Deployment**:
+   - Development: Vite dev server (port 5173)
+   - Production: Optimized bundle with environment variables
+   - Render: Static Site with `_redirects` for SPA routing
+
+5. **Key Differences**:
+   - No dependency injection (React doesn't need it)
+   - Functional components + hooks (vs. class-based components)
+   - JSX instead of Angular templates
+   - Manual subscription management replaced by useEffect cleanup
+
+**Current Status**: React build successful, ready for deployment. Angular remains as backup.
 ✅ **Production Deployed** - Live on Render with PostgreSQL  
 ✅ **Core Features** - Auth, Products, Orders, Inventory, Events  
 ✅ **Event-Driven** - Decoupled Order/Inventory modules
