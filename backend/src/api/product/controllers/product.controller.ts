@@ -78,6 +78,6 @@ export class ProductController {
     @Param() product: FindOneParams,
     @CurrentUser() user: User,
   ) {
-    return this.productService.deleteProduct(product.id, user.id);
+    return this.productService.deleteProduct(product.id, user);
   }
 }

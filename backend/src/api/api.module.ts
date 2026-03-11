@@ -5,9 +5,12 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { ProductModule } from './product/product.module';
+import { ProductVariationModule } from './product-variation/product-variation.module';
 import { OrderModule } from './order/order.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { CategoryModule } from './category/category.module';
+import { ColorModule } from './color/color.module';
+import { SizeModule } from './size/size.module';
 import { ErrorsFilter } from 'src/errors/errors.filter';
 
 @Module({
@@ -16,9 +19,12 @@ import { ErrorsFilter } from 'src/errors/errors.filter';
     UserModule,
     RoleModule,
     ProductModule,
+    ProductVariationModule,
     OrderModule,
     InventoryModule,
     CategoryModule,
+    ColorModule,
+    SizeModule,
   ],
   providers: [
     {

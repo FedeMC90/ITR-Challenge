@@ -22,9 +22,15 @@ export class Country {
 }
 
 export enum CountryCodes {
-  Egypt = 'EG',
+  US = 'US',
+  AR = 'AR',
+  EG = 'EG',
+  ES = 'ES',
 }
 
 export enum Countries {
-  Egypt = 'Egypt',
+  US = 'United States',
+  AR = 'Argentina',
+  EG = 'Egypt',
+  ES = 'Spain',
 }
