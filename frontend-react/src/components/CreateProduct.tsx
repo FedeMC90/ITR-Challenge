@@ -75,18 +75,6 @@ const CreateProduct: React.FC = () => {
 		setLoading(true);
 
 		try {
-			// First, create the product with the selected category
-			const createResponse = await productService.createProduct(selectedCategoryId);
-
-			if (!createResponse.isSuccess) {
-				setError('Failed to create product');
-				setLoading(false);
-				return;
-			}
-
-			const newProductId = createResponse.data.id;
-			setProductId(newProductId);
-
 			// Build details object based on category
 			let details: ProductDetails;
 
@@ -116,8 +104,9 @@ const CreateProduct: React.FC = () => {
 				return;
 			}
 
-			// Then, add details to the created product
-			await productService.addProductDetails(newProductId, {
+			// Create product with ALL data in a single request
+			const createResponse = await productService.createProduct({
+				categoryId: selectedCategoryId,
 				title,
 				code,
 				description,
@@ -126,6 +115,13 @@ const CreateProduct: React.FC = () => {
 				details,
 			});
 
+			if (!createResponse.isSuccess) {
+				setError('Failed to create product');
+				setLoading(false);
+				return;
+			}
+
+			setProductId(createResponse.data.id);
 			setSuccess('Product created successfully!');
 			setLoading(false);
 			setStep(3);

@@ -1,5 +1,12 @@
 import apiClient from '../config/axios';
-import type { ProductResponse, ProductCreateResponse, ProductDetailsPayload, ApiResponse, Product } from '../types';
+import type {
+	ProductResponse,
+	ProductCreateResponse,
+	ProductDetailsPayload,
+	CreateProductPayload,
+	ApiResponse,
+	Product,
+} from '../types';
 
 export const productService = {
 	getProducts: async (page: number = 1, limit: number = 10): Promise<ProductResponse> => {
@@ -7,10 +14,8 @@ export const productService = {
 		return response.data;
 	},
 
-	createProduct: async (categoryId: number): Promise<ProductCreateResponse> => {
-		const response = await apiClient.post<ProductCreateResponse>('/product/create', {
-			categoryId,
-		});
+	createProduct: async (productData: CreateProductPayload): Promise<ProductCreateResponse> => {
+		const response = await apiClient.post<ProductCreateResponse>('/product/create', productData);
 		return response.data;
 	},
 

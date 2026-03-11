@@ -69,9 +69,17 @@ export class ProductService {
 
     if (!category) throw new NotFoundException(errorMessages.category.notFound);
 
-    const product = await this.entityManager.create(Product, {
+    // Create product with all details in one transaction
+    const product = this.entityManager.create(Product, {
       category,
       merchantId,
+      title: data.title,
+      code: data.code,
+      description: data.description,
+      variationType: data.variationType,
+      about: data.about,
+      details: data.details,
+      isActive: false, // Start as inactive, will be activated separately
     });
 
     return this.entityManager.save(product);

@@ -88,6 +88,16 @@ export interface FashionDetails {
 
 export type ProductDetails = ComputerDetails | FashionDetails;
 
+export interface CreateProductPayload {
+	categoryId: number;
+	title: string;
+	code: string;
+	description: string;
+	variationType: string;
+	about: string[];
+	details: ProductDetails;
+}
+
 export interface ProductDetailsPayload {
 	title: string;
 	code: string;
