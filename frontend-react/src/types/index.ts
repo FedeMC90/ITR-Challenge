@@ -107,6 +107,42 @@ export interface ProductDetailsPayload {
 	details: ProductDetails;
 }
 
+// Product Variation Types
+export interface VariationItem {
+	colorName: string;
+	sizeCode: string;
+	imageUrls?: string[];
+}
+
+export interface CreateVariationsPayload {
+	variations: VariationItem[];
+	basePrice: number;
+	currencyCode?: string;
+	countryCode?: string;
+}
+
+export interface ProductVariationPrice {
+	id: number;
+	price: number | string;
+	currencyCode: string;
+	countryCode: string;
+}
+
+export interface ProductVariation {
+	id: number;
+	productId: number;
+	colorName: string;
+	sizeCode: string;
+	imageUrls: string[];
+	prices: ProductVariationPrice[];
+}
+
+export interface SetVariationPricePayload {
+	price: number;
+	currencyCode: string;
+	countryCode: string;
+}
+
 // Order Types
 export interface CreateOrderItem {
 	productId: number;

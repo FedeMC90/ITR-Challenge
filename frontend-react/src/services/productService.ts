@@ -33,4 +33,9 @@ export const productService = {
 		const response = await apiClient.post<ApiResponse<Product>>(`/product/${productId}/toggle-status`, {});
 		return response.data;
 	},
+
+	deleteProduct: async (productId: number): Promise<ApiResponse<void>> => {
+		const response = await apiClient.delete<ApiResponse<void>>(`/product/${productId}`);
+		return response.data;
+	},
 };

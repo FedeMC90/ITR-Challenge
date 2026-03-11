@@ -67,7 +67,18 @@ const OrderList: React.FC = () => {
 						>
 							<div className='order-header'>
 								<h3>Order #{order.id}</h3>
-								<span className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</span>
+								<div className='header-actions'>
+									<span className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</span>
+									{order.status.toLowerCase() === 'pending' && (
+										<button
+											onClick={() => handleCancelOrder(order.id)}
+											className='cancel-icon-button'
+											title='Cancel order'
+										>
+											✖
+										</button>
+									)}
+								</div>
 							</div>
 
 							<div className='order-info'>
@@ -82,27 +93,23 @@ const OrderList: React.FC = () => {
 							<div className='order-items'>
 								<h4>Items:</h4>
 								{order.items && order.items.length > 0 ? (
-									<ul>
-										{order.items.map((item) => (
-											<li key={item.id}>
-												{item.product?.title || `Product #${item.productId}`} - Qty: {item.quantity} - $
-												{Number(item.price).toFixed(2)}
-											</li>
-										))}
-									</ul>
+									<>
+										<ul>
+											{order.items.map((item) => (
+												<li key={item.id}>
+													{item.product?.title || `Product #${item.productId}`} - Qty: {item.quantity} - $
+													{Number(item.price).toFixed(2)} each
+												</li>
+											))}
+										</ul>
+										<div className='order-total'>
+											<strong>Total: ${Number(order.totalAmount).toFixed(2)}</strong>
+										</div>
+									</>
 								) : (
 									<p>No items</p>
 								)}
 							</div>
-
-							{order.status === 'pending' && (
-								<button
-									onClick={() => handleCancelOrder(order.id)}
-									className='cancel-button'
-								>
-									Cancel Order
-								</button>
-							)}
 						</div>
 					))}
 				</div>
