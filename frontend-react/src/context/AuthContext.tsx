@@ -11,6 +11,7 @@ interface AuthContextType {
 	logout: () => void;
 	hasRole: (roleIds: number[]) => boolean;
 	isAdmin: () => boolean;
+	canCreateProducts: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -80,6 +81,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 		return hasRole([3]); // RoleId.Admin = 3
 	};
 
+	const canCreateProducts = (): boolean => {
+		return hasRole([2, 3]); // RoleId.Merchant = 2, RoleId.Admin = 3
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -90,6 +95,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 				logout,
 				hasRole,
 				isAdmin,
+				canCreateProducts,
 			}}
 		>
 			{children}

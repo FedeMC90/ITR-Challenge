@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
-	const { user, isAuthenticated, logout, isAdmin } = useAuth();
+	const { user, isAuthenticated, logout, isAdmin, canCreateProducts } = useAuth();
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
@@ -26,9 +26,11 @@ const Navbar: React.FC = () => {
 				<li>
 					<Link to='/products'>Products</Link>
 				</li>
-				<li>
-					<Link to='/create-product'>Create Product</Link>
-				</li>
+				{canCreateProducts() && (
+					<li>
+						<Link to='/create-product'>Create Product</Link>
+					</li>
+				)}
 				<li>
 					<Link to='/create-order'>Create Order</Link>
 				</li>
