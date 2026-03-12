@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { productService } from '../services/productService';
 import { productVariationService } from '../services/productVariationService';
 import { useAuth } from '../hooks/useAuth';
+import { useSocket } from '../hooks/useSocket';
 import type { Product } from '../types';
 import './ProductList.css';
 
@@ -13,7 +14,10 @@ const ProductList: React.FC = () => {
 	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 	const [showModal, setShowModal] = useState(false);
 	const [loadingDetails, setLoadingDetails] = useState(false);
+	const [toast, setToast] = useState<{ message: string; type: 'info' | 'success' } | null>(null);
+
 	const { isAdmin, hasRole } = useAuth();
+	const { socket, isConnected } = useSocket();
 
 	// Check if user is Admin (3) or Merchant (2)
 	const canManageProducts = () => hasRole([2, 3]);
@@ -21,6 +25,55 @@ const ProductList: React.FC = () => {
 	useEffect(() => {
 		loadProducts();
 	}, []);
+
+	// Listen for real-time product updates via WebSocket
+	useEffect(() => {
+		if (!socket || !isConnected) return;
+
+		const handleProductActivated = (data: { productId: number; product: Product }) => {
+			console.log('🟢 Product activated:', data);
+
+			// Check if product already exists in list
+			const existingIndex = products.findIndex((p) => p.id === data.productId);
+
+			if (existingIndex >= 0) {
+				// Update existing product
+				setProducts((prev) => prev.map((p) => (p.id === data.productId ? { ...p, isActive: true } : p)));
+			} else {
+				// Add new product to list
+				setProducts((prev) => [data.product, ...prev]);
+				// Load price for new product
+				loadProductPrices([data.product]);
+			}
+
+			showToast(`Product "${data.product.title}" is now active`, 'success');
+		};
+
+		const handleProductDeactivated = (data: { productId: number }) => {
+			console.log('🔴 Product deactivated:', data);
+
+			// Update product status to inactive
+			setProducts((prev) => prev.map((p) => (p.id === data.productId ? { ...p, isActive: false } : p)));
+
+			const product = products.find((p) => p.id === data.productId);
+			if (product) {
+				showToast(`Product "${product.title}" has been deactivated`, 'info');
+			}
+		};
+
+		socket.on('product-activated', handleProductActivated);
+		socket.on('product-deactivated', handleProductDeactivated);
+
+		return () => {
+			socket.off('product-activated', handleProductActivated);
+			socket.off('product-deactivated', handleProductDeactivated);
+		};
+	}, [socket, isConnected, products]);
+
+	const showToast = (message: string, type: 'info' | 'success') => {
+		setToast({ message, type });
+		setTimeout(() => setToast(null), 4000);
+	};
 
 	const loadProducts = async () => {
 		try {
@@ -335,6 +388,13 @@ const ProductList: React.FC = () => {
 							<div className='modal-error'>Failed to load product details</div>
 						)}
 					</div>
+				</div>
+			)}
+
+			{/* Toast Notification */}
+			{toast && (
+				<div className={`toast toast-${toast.type}`}>
+					<span>{toast.message}</span>
 				</div>
 			)}
 		</div>

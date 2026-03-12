@@ -15,7 +15,7 @@ export class UserController {
   @Serialize(UserDto)
   @Get('profile')
   profile(@CurrentUser() user: User) {
-    return this.userService.findById(user.id);
+    return this.userService.findById(user.id, { roles: true });
   }
 
   @Auth(RoleIds.Admin)

@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { EntityManager } from 'typeorm';
 import { Order, OrderStatus } from 'src/database/entities/order.entity';
 import { OrderItem } from 'src/database/entities/order-item.entity';
 import { Product } from 'src/database/entities/product.entity';
 import { ProductVariationPrice } from 'src/database/entities/productVariation_price.entity';
 import { CreateOrderDto } from '../dto/order.dto';
-import { OrderCreatedEvent } from 'src/common/events/order-created.event';
-import { OrderCancelledEvent } from 'src/common/events/order-cancelled.event';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
-    private readonly eventEmitter: EventEmitter2,
+    @InjectQueue('orders')
+    private readonly ordersQueue: Queue,
   ) {}
 
   async createOrder(userId: number, createOrderDto: CreateOrderDto) {
@@ -85,18 +85,16 @@ export class OrderService {
         relations: ['items', 'items.product'],
       });
 
-      // Emit OrderCreatedEvent for decoupled handling (e.g., inventory update)
-      this.eventEmitter.emit(
-        'order.created',
-        new OrderCreatedEvent(
-          order.id,
-          userId,
-          createOrderDto.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
-        ),
-      );
+      // ASYNC: Add job to queue for inventory reservation
+      // This allows immediate response to client while processing happens in background
+      await this.ordersQueue.add('reserve-inventory', {
+        orderId: order.id,
+        userId,
+        items: createOrderDto.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      });
 
       return createdOrder;
     });
@@ -130,18 +128,15 @@ export class OrderService {
       order.status = OrderStatus.CANCELLED;
       await manager.save(order);
 
-      // Emit OrderCancelledEvent for decoupled handling (e.g., inventory release)
-      this.eventEmitter.emit(
-        'order.cancelled',
-        new OrderCancelledEvent(
-          order.id,
-          userId,
-          order.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
-        ),
-      );
+      // ASYNC: Add job to queue for inventory release
+      await this.ordersQueue.add('release-inventory', {
+        orderId: order.id,
+        userId,
+        items: order.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      });
 
       return order;
     });

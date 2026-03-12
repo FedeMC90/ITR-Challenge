@@ -59,6 +59,141 @@
 	background-color: #c53030;
 }
 
+.user-email {
+	cursor: pointer;
+	transition:
+		color 0.3s,
+		text-decoration 0.3s;
+}
+
+.user-email:hover {
+	color: #667eea;
+	text-decoration: underline;
+}
+
+/* User Profile Modal */
+.user-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+	padding: 20px;
+}
+
+.user-modal-content {
+	background: white;
+	border-radius: 12px;
+	max-width: 500px;
+	width: 100%;
+	max-height: 80vh;
+	overflow-y: auto;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.user-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 24px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.user-modal-header h2 {
+	margin: 0;
+	color: #2d3748;
+	font-size: 24px;
+}
+
+.user-modal-close {
+	background: none;
+	border: none;
+	font-size: 28px;
+	color: #718096;
+	cursor: pointer;
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition:
+		background-color 0.2s,
+		color 0.2s;
+}
+
+.user-modal-close:hover {
+	background-color: #f7fafc;
+	color: #2d3748;
+}
+
+.user-modal-loading,
+.user-modal-error {
+	padding: 40px;
+	text-align: center;
+	color: #718096;
+}
+
+.user-modal-error {
+	color: #e53e3e;
+}
+
+.user-modal-body {
+	padding: 24px;
+}
+
+.user-info-section {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.user-info-item {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 12px;
+	background-color: #f7fafc;
+	border-radius: 6px;
+	border-left: 3px solid #667eea;
+}
+
+.user-info-item strong {
+	color: #2d3748;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.user-info-item span {
+	color: #4a5568;
+	font-size: 16px;
+}
+
+.user-roles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.role-badge {
+	display: inline-block;
+	padding: 6px 12px;
+	background-color: #667eea;
+	color: white;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+}
+
 @media (max-width: 768px) {
 	.navbar {
 		flex-direction: column;

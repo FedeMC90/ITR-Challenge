@@ -7,8 +7,8 @@ export interface UserRole {
 export interface User {
 	id: number;
 	email: string;
-	firstName: string;
-	lastName: string;
+	firstName?: string;
+	lastName?: string;
 	roles: UserRole[];
 }
 
@@ -205,6 +205,14 @@ export interface RoleListResponse {
 export interface UserListResponse {
 	isSuccess: boolean;
 	data: User[];
+}
+
+export interface UserProfileResponse {
+	isSuccess: boolean;
+	message: string;
+	data: User;
+	errorCode: string | null;
+	errors: string[];
 }
 
 // API Response wrapper
