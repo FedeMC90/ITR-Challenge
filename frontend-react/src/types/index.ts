@@ -82,7 +82,6 @@ export interface FashionDetails {
 	category: 'Fashion';
 	material: string;
 	brand: string;
-	size: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
 	season: string;
 }
 
@@ -112,6 +111,7 @@ export interface VariationItem {
 	colorName: string;
 	sizeCode: string;
 	imageUrls?: string[];
+	price?: number;
 }
 
 export interface CreateVariationsPayload {
@@ -208,4 +208,28 @@ export interface ApiResponse<T = unknown> {
 	data: T;
 	errorCode: string | null;
 	errors: string[];
+}
+
+// Color & Size Types
+export interface Color {
+	name: string;
+	hexCode: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Size {
+	code: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ColorListResponse {
+	isSuccess?: boolean;
+	data?: Color[];
+}
+
+export interface SizeListResponse {
+	isSuccess?: boolean;
+	data?: Size[];
 }

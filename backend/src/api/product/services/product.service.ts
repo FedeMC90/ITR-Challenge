@@ -10,6 +10,8 @@ import { CreateProductDto, ProductDetailsDto } from '../dto/product.dto';
 import { Category } from '../../../database/entities/category.entity';
 import { Product } from 'src/database/entities/product.entity';
 import { OrderItem } from 'src/database/entities/order-item.entity';
+import { ProductVariation } from 'src/database/entities/productVariation.entity';
+import { ProductVariationPrice } from 'src/database/entities/productVariation_price.entity';
 import { errorMessages } from 'src/errors/custom';
 import { validate } from 'class-validator';
 import { successObject } from 'src/common/helper/sucess-response.interceptor';
@@ -185,7 +187,37 @@ export class ProductService {
       throw new BadRequestException(errorMessages.product.hasOrders);
     }
 
-    // If no orders, proceed with deletion
+    // Delete in correct order due to foreign key constraints:
+    // 1. First delete all ProductVariationPrice records
+    // 2. Then delete all ProductVariation records
+    // 3. Finally delete the Product
+
+    // Get all product variations for this product
+    const variations = await this.entityManager.find(ProductVariation, {
+      where: { productId },
+    });
+
+    // Delete all prices for each variation
+    for (const variation of variations) {
+      await this.entityManager
+        .createQueryBuilder()
+        .delete()
+        .from(ProductVariationPrice)
+        .where('productVariationId = :variationId', {
+          variationId: variation.id,
+        })
+        .execute();
+    }
+
+    // Delete all variations
+    await this.entityManager
+      .createQueryBuilder()
+      .delete()
+      .from(ProductVariation)
+      .where('productId = :productId', { productId })
+      .execute();
+
+    // Finally delete the product
     const result = await this.entityManager
       .createQueryBuilder()
       .delete()

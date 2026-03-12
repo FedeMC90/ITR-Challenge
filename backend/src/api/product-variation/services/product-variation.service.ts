@@ -88,19 +88,22 @@ export class ProductVariationService {
 
       const savedVariation = await this.entityManager.save(variation);
 
+      // Use individual variation price if provided, otherwise use basePrice
+      const variationPrice = variationData.price ?? data.basePrice;
+
       // Create price for this variation
       const price = this.entityManager.create(ProductVariationPrice, {
         productVariationId: savedVariation.id,
         currencyCode,
         countryCode,
-        price: data.basePrice,
+        price: variationPrice,
       });
 
       await this.entityManager.save(price);
 
       createdVariations.push({
         ...savedVariation,
-        price: data.basePrice,
+        price: variationPrice,
         currencyCode,
         countryCode,
       });

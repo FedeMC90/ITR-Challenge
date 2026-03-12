@@ -22,6 +22,10 @@ export class VariationItemDto {
   @IsOptional()
   @IsString({ each: true })
   public imageUrls?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  public price?: number;
 }
 
 export class CreateVariationsDto {
