@@ -10,6 +10,9 @@ const ProductList: React.FC = () => {
 	const [productPrices, setProductPrices] = useState<Record<number, number | null>>({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+	const [showModal, setShowModal] = useState(false);
+	const [loadingDetails, setLoadingDetails] = useState(false);
 	const { isAdmin, hasRole } = useAuth();
 
 	// Check if user is Admin (3) or Merchant (2)
@@ -115,6 +118,26 @@ const ProductList: React.FC = () => {
 		}
 	};
 
+	const handleOpenDetails = async (productId: number) => {
+		try {
+			setLoadingDetails(true);
+			setShowModal(true);
+			const productDetails = await productService.getProduct(productId);
+			setSelectedProduct(productDetails);
+		} catch (err) {
+			console.error('Failed to load product details:', err);
+			alert('Failed to load product details');
+			setShowModal(false);
+		} finally {
+			setLoadingDetails(false);
+		}
+	};
+
+	const handleCloseModal = () => {
+		setShowModal(false);
+		setSelectedProduct(null);
+	};
+
 	if (loading) {
 		return <div className='loading'>Loading products...</div>;
 	}
@@ -135,25 +158,16 @@ const ProductList: React.FC = () => {
 						<div
 							key={product.id}
 							className={`product-card ${!product.isActive ? 'inactive' : ''}`}
+							onClick={() => handleOpenDetails(product.id)}
+							style={{ cursor: 'pointer' }}
 						>
 							<div className='product-header'>
 								<div className='title-section'>
 									<h3>{product.title || 'Untitled Product'}</h3>
 								</div>
-								<div className='header-actions'>
-									<span className={`status-badge ${product.isActive ? 'active' : 'inactive'}`}>
-										{product.isActive ? 'Active' : 'Inactive'}
-									</span>
-									{canManageProducts() && (
-										<button
-											onClick={() => handleDeleteProduct(product)}
-											className='delete-button'
-											title='Delete product'
-										>
-											🗑️
-										</button>
-									)}
-								</div>
+								<span className={`status-badge ${product.isActive ? 'active' : 'inactive'}`}>
+									{product.isActive ? 'Active' : 'Inactive'}
+								</span>
 							</div>
 
 							<div className='product-info'>
@@ -179,17 +193,148 @@ const ProductList: React.FC = () => {
 									)}
 								</p>
 							</div>
-
-							{isAdmin() && (
-								<button
-									onClick={() => handleToggleStatus(product.id)}
-									className='toggle-button'
-								>
-									{product.isActive ? 'Deactivate' : 'Activate'}
-								</button>
-							)}
 						</div>
 					))}
+				</div>
+			)}
+
+			{/* Product Details Modal */}
+			{showModal && (
+				<div
+					className='modal-overlay'
+					onClick={handleCloseModal}
+				>
+					<div
+						className='modal-content'
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className='modal-header'>
+							<h2>Product Details</h2>
+							<button
+								className='close-button'
+								onClick={handleCloseModal}
+							>
+								✕
+							</button>
+						</div>
+
+						{loadingDetails ? (
+							<div className='modal-loading'>Loading details...</div>
+						) : selectedProduct ? (
+							<>
+								<div className='modal-body'>
+									<div className='detail-section'>
+										<h3>{selectedProduct.title}</h3>
+										<p className='product-code'>
+											<strong>Code:</strong> {selectedProduct.code}
+										</p>
+										<p className={`status-indicator ${selectedProduct.isActive ? 'active' : 'inactive'}`}>
+											<strong>Status:</strong> {selectedProduct.isActive ? 'Active' : 'Inactive'}
+										</p>
+									</div>
+
+									<div className='detail-section'>
+										<h4>Description</h4>
+										<p>{selectedProduct.description || 'No description available'}</p>
+									</div>
+
+									<div className='detail-section'>
+										<h4>Variation Type</h4>
+										<p>{selectedProduct.variationType || 'N/A'}</p>
+									</div>
+
+									{selectedProduct.about && selectedProduct.about.length > 0 && (
+										<div className='detail-section'>
+											<h4>About</h4>
+											<ul className='about-list'>
+												{selectedProduct.about.map((item, index) => (
+													<li key={index}>{item}</li>
+												))}
+											</ul>
+										</div>
+									)}
+
+									{selectedProduct.details && (
+										<div className='detail-section'>
+											<h4>Technical Details</h4>
+											<div className='details-grid'>
+												{selectedProduct.details.category === 'Computers' && (
+													<>
+														<div className='detail-item'>
+															<strong>Brand:</strong> {selectedProduct.details.brand}
+														</div>
+														<div className='detail-item'>
+															<strong>Series:</strong> {selectedProduct.details.series}
+														</div>
+														<div className='detail-item'>
+															<strong>Capacity:</strong> {selectedProduct.details.capacity}{' '}
+															{selectedProduct.details.capacityUnit}
+														</div>
+														<div className='detail-item'>
+															<strong>Type:</strong> {selectedProduct.details.capacityType}
+														</div>
+													</>
+												)}
+												{selectedProduct.details.category === 'Fashion' && (
+													<>
+														<div className='detail-item'>
+															<strong>Brand:</strong> {selectedProduct.details.brand}
+														</div>
+														<div className='detail-item'>
+															<strong>Material:</strong> {selectedProduct.details.material}
+														</div>
+														<div className='detail-item'>
+															<strong>Season:</strong> {selectedProduct.details.season}
+														</div>
+													</>
+												)}
+											</div>
+										</div>
+									)}
+
+									{productPrices[selectedProduct.id] !== undefined && (
+										<div className='detail-section price-section'>
+											<h4>Price</h4>
+											<p className='detail-price'>
+												{productPrices[selectedProduct.id] !== null ? (
+													<span className='price-amount'>${productPrices[selectedProduct.id]!.toFixed(2)} USD</span>
+												) : (
+													<span className='price-unavailable'>Not available</span>
+												)}
+											</p>
+										</div>
+									)}
+								</div>
+
+								<div className='modal-footer'>
+									{isAdmin() && (
+										<button
+											onClick={() => {
+												handleToggleStatus(selectedProduct.id);
+												handleCloseModal();
+											}}
+											className={`modal-toggle-button ${selectedProduct.isActive ? 'deactivate' : 'activate'}`}
+										>
+											{selectedProduct.isActive ? 'Deactivate Product' : 'Activate Product'}
+										</button>
+									)}
+									{canManageProducts() && (
+										<button
+											onClick={() => {
+												handleDeleteProduct(selectedProduct);
+												handleCloseModal();
+											}}
+											className='modal-delete-button'
+										>
+											Delete Product
+										</button>
+									)}
+								</div>
+							</>
+						) : (
+							<div className='modal-error'>Failed to load product details</div>
+						)}
+					</div>
 				</div>
 			)}
 		</div>

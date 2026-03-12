@@ -14,6 +14,11 @@ export const productService = {
 		return response.data;
 	},
 
+	getProduct: async (productId: number): Promise<Product> => {
+		const response = await apiClient.get<ApiResponse<Product>>(`/product/${productId}`);
+		return response.data.data;
+	},
+
 	createProduct: async (productData: CreateProductPayload): Promise<ProductCreateResponse> => {
 		const response = await apiClient.post<ProductCreateResponse>('/product/create', productData);
 		return response.data;

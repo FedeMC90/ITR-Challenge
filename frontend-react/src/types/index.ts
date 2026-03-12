@@ -46,6 +46,12 @@ export interface Product {
 	description: string;
 	isActive: boolean;
 	variationType: string;
+	about?: string[];
+	details?: ProductDetails | null;
+	categoryId?: number;
+	merchantId?: number;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface ProductResponse {
