@@ -21,6 +21,11 @@ out/
 .env.local
 .env.*.local
 *.env
+# Keep example files
+!.env.example
+!.env.docker.example
+# Ignore actual docker env (has passwords)
+.env.docker
 
 # IDE
 .vscode/*
@@ -59,6 +64,12 @@ ecommerce-frontend/.env
 *.sqlite
 *.db
 database-data
+
+# Docker
+docker-compose.override.yml
+*.pid
+*.seed
+*.pid.lock
 
 # OS
 Thumbs.db
