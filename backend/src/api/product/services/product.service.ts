@@ -16,12 +16,17 @@ import { errorMessages } from 'src/errors/custom';
 import { validate } from 'class-validator';
 import { successObject } from 'src/common/helper/sucess-response.interceptor';
 import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
+import { EventsGateway } from 'src/common/gateway/events.gateway';
+import { Inject, Optional } from '@nestjs/common';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
+    @Optional()
+    @Inject(EventsGateway)
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   /**
@@ -137,18 +142,36 @@ export class ProductService {
 
     if (!product) throw new NotFoundException(errorMessages.product.notFound);
 
+    const newStatus = !product.isActive;
+
     const result = await this.entityManager
       .createQueryBuilder()
       .update<Product>(Product)
       .set({
-        isActive: !product.isActive,
+        isActive: newStatus,
       })
       .where('id = :id', { id: productId })
       .andWhere('merchantId = :merchantId', { merchantId })
       .returning(['id', 'isActive', 'title'])
       .execute();
 
-    return result.raw[0];
+    const updatedProduct = result.raw[0];
+
+    // Emit WebSocket event to notify all connected clients
+    if (this.eventsGateway) {
+      if (newStatus) {
+        // Product activated - send full product data so clients can add it to their list
+        const fullProduct = await this.entityManager.findOne(Product, {
+          where: { id: productId },
+        });
+        this.eventsGateway.emitProductActivated(productId, fullProduct);
+      } else {
+        // Product deactivated - just send ID so clients can remove it
+        this.eventsGateway.emitProductDeactivated(productId);
+      }
+    }
+
+    return updatedProduct;
   }
 
   async validate(productId: number) {

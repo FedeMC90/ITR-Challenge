@@ -23,6 +23,10 @@ export const configuration = () => ({
   jwt: {
     secret: process.env.JWT_SECRET || 'secret',
   },
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+  },
   adminUser: {
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
     password: process.env.ADMIN_PASSWORD || '12345678',

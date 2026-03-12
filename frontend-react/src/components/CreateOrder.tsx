@@ -2,20 +2,64 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { orderService } from '../services/orderService';
+import { useSocket } from '../hooks/useSocket';
 import type { Product, CreateOrderItem } from '../types';
 import './CreateOrder.css';
+
+type OrderStatus = 'idle' | 'creating' | 'processing' | 'confirmed' | 'failed';
 
 const CreateOrder: React.FC = () => {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [orderItems, setOrderItems] = useState<CreateOrderItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [orderStatus, setOrderStatus] = useState<OrderStatus>('idle');
+	const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
 
 	const navigate = useNavigate();
+	const { socket, isConnected } = useSocket();
 
 	useEffect(() => {
 		loadProducts();
 	}, []);
+
+	// Listen for WebSocket order updates
+	useEffect(() => {
+		if (!socket || !isConnected) return;
+
+		const handleOrderUpdate = (data: { orderId: number; status: string; message?: string }) => {
+			console.log('📦 Order update received:', data);
+
+			// Only process updates for the current order
+			if (currentOrderId && data.orderId === currentOrderId) {
+				const status = data.status.toUpperCase();
+
+				if (status === 'PROCESSING') {
+					setOrderStatus('processing');
+				} else if (status === 'CONFIRMED') {
+					setOrderStatus('confirmed');
+					// Navigate to orders page after a short delay
+					setTimeout(() => {
+						navigate('/orders');
+					}, 2000);
+				} else if (status === 'FAILED') {
+					setOrderStatus('failed');
+					alert(data.message || 'Order processing failed');
+					// Reset after showing error
+					setTimeout(() => {
+						setOrderStatus('idle');
+						setCurrentOrderId(null);
+					}, 3000);
+				}
+			}
+		};
+
+		socket.on('order-update', handleOrderUpdate);
+
+		return () => {
+			socket.off('order-update', handleOrderUpdate);
+		};
+	}, [socket, isConnected, currentOrderId, navigate]);
 
 	const loadProducts = async () => {
 		try {
@@ -27,7 +71,9 @@ const CreateOrder: React.FC = () => {
 
 			setProducts(sortedProducts);
 			setError('');
-		} catch (err: unknown) {		console.error('Failed to load products:', err);			setError('Failed to load products');
+		} catch (err: unknown) {
+			console.error('Failed to load products:', err);
+			setError('Failed to load products');
 		} finally {
 			setLoading(false);
 		}
@@ -70,18 +116,27 @@ const CreateOrder: React.FC = () => {
 		}
 
 		try {
+			setOrderStatus('creating');
 			const response = await orderService.createOrder({ items: orderItems });
-			if (response.isSuccess) {
-				alert('Order created successfully!');
-				navigate('/orders');
+
+			if (response.isSuccess && response.data) {
+				// Order created successfully, now waiting for async processing
+				setCurrentOrderId(response.data.id);
+				// Status will be updated via WebSocket
+				console.log('✅ Order created, waiting for processing updates...');
 			}
 		} catch (err: unknown) {
+			setOrderStatus('failed');
 			if (err && typeof err === 'object' && 'response' in err) {
 				const axiosError = err as { response?: { data?: { message?: string } } };
 				alert(axiosError.response?.data?.message || 'Failed to create order');
 			} else {
 				alert('Failed to create order');
 			}
+			// Reset status after error
+			setTimeout(() => {
+				setOrderStatus('idle');
+			}, 2000);
 		}
 	};
 
@@ -166,11 +221,42 @@ const CreateOrder: React.FC = () => {
 								})}
 							</div>
 
+							{/* Order Status Indicator */}
+							{orderStatus !== 'idle' && (
+								<div className={`order-status order-status-${orderStatus}`}>
+									{orderStatus === 'creating' && (
+										<>
+											<span className='status-spinner'>⏳</span>
+											<span>Creating order...</span>
+										</>
+									)}
+									{orderStatus === 'processing' && (
+										<>
+											<span className='status-spinner'>🔄</span>
+											<span>Processing order... Reserving inventory...</span>
+										</>
+									)}
+									{orderStatus === 'confirmed' && (
+										<>
+											<span className='status-success'>✅</span>
+											<span>Order confirmed! Redirecting...</span>
+										</>
+									)}
+									{orderStatus === 'failed' && (
+										<>
+											<span className='status-error'>❌</span>
+											<span>Order processing failed</span>
+										</>
+									)}
+								</div>
+							)}
+
 							<button
 								onClick={handleCreateOrder}
 								className='create-order-button'
+								disabled={orderStatus !== 'idle'}
 							>
-								Create Order
+								{orderStatus === 'idle' ? 'Create Order' : 'Processing...'}
 							</button>
 						</>
 					)}
