@@ -29,6 +29,16 @@ export interface AuthResponse {
 }
 
 // Product Types
+export interface Category {
+	id: number;
+	name: string;
+}
+
+export interface CategoryListResponse {
+	isSuccess: boolean;
+	data: Category[];
+}
+
 export interface Product {
 	id: number;
 	code: string;
@@ -36,6 +46,12 @@ export interface Product {
 	description: string;
 	isActive: boolean;
 	variationType: string;
+	about?: string[];
+	details?: ProductDetails | null;
+	categoryId?: number;
+	merchantId?: number;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface ProductResponse {
@@ -59,13 +75,78 @@ export interface ProductCreateResponse {
 	};
 }
 
+export interface ComputerDetails {
+	category: 'Computers';
+	capacity: number;
+	capacityUnit: 'GB' | 'TB';
+	capacityType: 'SSD' | 'HD';
+	brand: string;
+	series: string;
+}
+
+export interface FashionDetails {
+	category: 'Fashion';
+	material: string;
+	brand: string;
+	season: string;
+}
+
+export type ProductDetails = ComputerDetails | FashionDetails;
+
+export interface CreateProductPayload {
+	categoryId: number;
+	title: string;
+	code: string;
+	description: string;
+	variationType: string;
+	about: string[];
+	details: ProductDetails;
+}
+
 export interface ProductDetailsPayload {
 	title: string;
 	code: string;
 	description: string;
 	variationType: string;
 	about: string[];
-	details: Record<string, unknown>;
+	details: ProductDetails;
+}
+
+// Product Variation Types
+export interface VariationItem {
+	colorName: string;
+	sizeCode: string;
+	imageUrls?: string[];
+	price?: number;
+}
+
+export interface CreateVariationsPayload {
+	variations: VariationItem[];
+	basePrice: number;
+	currencyCode?: string;
+	countryCode?: string;
+}
+
+export interface ProductVariationPrice {
+	id: number;
+	price: number | string;
+	currencyCode: string;
+	countryCode: string;
+}
+
+export interface ProductVariation {
+	id: number;
+	productId: number;
+	colorName: string;
+	sizeCode: string;
+	imageUrls: string[];
+	prices: ProductVariationPrice[];
+}
+
+export interface SetVariationPricePayload {
+	price: number;
+	currencyCode: string;
+	countryCode: string;
 }
 
 // Order Types
@@ -82,14 +163,14 @@ export interface OrderItem {
 	id: number;
 	productId: number;
 	quantity: number;
-	price: number;
+	price: number | string; // Backend returns DECIMAL as string
 	product: Product;
 }
 
 export interface Order {
 	id: number;
 	userId: number;
-	totalAmount: number;
+	totalAmount: number | string; // Backend returns DECIMAL as string
 	status: string;
 	createdAt: string;
 	items: OrderItem[];
@@ -133,4 +214,28 @@ export interface ApiResponse<T = unknown> {
 	data: T;
 	errorCode: string | null;
 	errors: string[];
+}
+
+// Color & Size Types
+export interface Color {
+	name: string;
+	hexCode: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Size {
+	code: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ColorListResponse {
+	isSuccess?: boolean;
+	data?: Color[];
+}
+
+export interface SizeListResponse {
+	isSuccess?: boolean;
+	data?: Size[];
 }

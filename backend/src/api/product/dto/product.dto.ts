@@ -15,6 +15,32 @@ export class CreateProductDto {
   @IsNumber()
   @IsNotEmpty()
   public categoryId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  public title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public code: string;
+
+  @IsDefined()
+  @IsString()
+  @IsIn(variationTypesKeys)
+  public variationType: string;
+
+  @IsDefined()
+  @Type(ProductDetailsTypeFn)
+  @ValidateNested()
+  public details: ProductDetails;
+
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  public about: string[];
+
+  @IsString()
+  @IsNotEmpty()
+  public description: string;
 }
 
 export class ProductDetailsDto {

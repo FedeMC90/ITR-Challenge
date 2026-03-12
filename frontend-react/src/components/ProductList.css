@@ -57,13 +57,23 @@
 	justify-content: space-between;
 	align-items: start;
 	margin-bottom: 15px;
+	gap: 10px;
+}
+
+.product-header .title-section {
+	flex: 1;
 }
 
 .product-header h3 {
 	margin: 0;
 	color: #2d3748;
 	font-size: 18px;
-	flex: 1;
+}
+
+.product-header .header-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .status-badge {
@@ -83,6 +93,29 @@
 	color: #742a2a;
 }
 
+.delete-button {
+	background-color: #fc8181;
+	border: none;
+	border-radius: 6px;
+	padding: 6px 10px;
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.delete-button:hover {
+	background-color: #f56565;
+	transform: scale(1.1);
+}
+
+.delete-button:active {
+	transform: scale(0.95);
+}
+
 .product-info {
 	margin-bottom: 15px;
 }
@@ -95,6 +128,28 @@
 
 .product-info strong {
 	color: #2d3748;
+}
+
+.product-price {
+	margin-top: 12px !important;
+	padding-top: 12px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.price-value {
+	color: #2f855a;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.price-unavailable {
+	color: #a0aec0;
+	font-style: italic;
+}
+
+.price-loading {
+	color: #718096;
+	font-style: italic;
 }
 
 .toggle-button {
@@ -120,4 +175,253 @@
 
 .product-card.inactive .toggle-button:hover {
 	background-color: #38a169;
+}
+
+/* Modal Styles */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	padding: 20px;
+}
+
+.modal-content {
+	background: white;
+	border-radius: 12px;
+	max-width: 700px;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 24px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+	margin: 0;
+	color: #2d3748;
+	font-size: 24px;
+}
+
+.close-button {
+	background: none;
+	border: none;
+	font-size: 28px;
+	color: #718096;
+	cursor: pointer;
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition:
+		background-color 0.2s,
+		color 0.2s;
+}
+
+.close-button:hover {
+	background-color: #f7fafc;
+	color: #2d3748;
+}
+
+.modal-loading,
+.modal-error {
+	padding: 40px;
+	text-align: center;
+	color: #718096;
+}
+
+.modal-error {
+	color: #e53e3e;
+}
+
+.modal-body {
+	padding: 24px;
+}
+
+.detail-section {
+	margin-bottom: 24px;
+}
+
+.detail-section:last-child {
+	margin-bottom: 0;
+}
+
+.detail-section h3 {
+	margin: 0 0 8px 0;
+	color: #2d3748;
+	font-size: 22px;
+}
+
+.detail-section h4 {
+	margin: 0 0 12px 0;
+	color: #2d3748;
+	font-size: 16px;
+	font-weight: 600;
+	border-bottom: 2px solid #e2e8f0;
+	padding-bottom: 8px;
+}
+
+.detail-section p {
+	margin: 8px 0;
+	color: #4a5568;
+	line-height: 1.6;
+}
+
+.product-code {
+	color: #718096 !important;
+	font-size: 14px;
+	font-family: 'Courier New', monospace;
+}
+
+.status-indicator {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	margin-top: 8px;
+}
+
+.status-indicator.active {
+	background-color: #c6f6d5;
+	color: #22543d;
+}
+
+.status-indicator.inactive {
+	background-color: #fed7d7;
+	color: #742a2a;
+}
+
+.about-list {
+	margin: 0;
+	padding-left: 20px;
+}
+
+.about-list li {
+	margin: 8px 0;
+	color: #4a5568;
+	line-height: 1.6;
+}
+
+.details-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 16px;
+}
+
+.detail-item {
+	padding: 12px;
+	background-color: #f7fafc;
+	border-radius: 6px;
+	border-left: 3px solid #667eea;
+}
+
+.detail-item strong {
+	display: block;
+	color: #2d3748;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 4px;
+}
+
+.price-section {
+	background-color: #f7fafc;
+	padding: 16px;
+	border-radius: 8px;
+	border: 2px solid #e2e8f0;
+}
+
+.detail-price {
+	margin: 0 !important;
+	font-size: 18px;
+}
+
+.price-amount {
+	color: #2f855a;
+	font-weight: 700;
+	font-size: 24px;
+}
+
+/* Modal Footer - Action Buttons */
+.modal-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	padding: 16px 24px;
+	border-top: 1px solid #e2e8f0;
+	background-color: #f7fafc;
+	border-radius: 0 0 12px 12px;
+}
+
+.modal-toggle-button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.modal-toggle-button.deactivate {
+	background-color: #fc8181;
+	color: white;
+}
+
+.modal-toggle-button.deactivate:hover {
+	background-color: #f56565;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(245, 101, 101, 0.3);
+}
+
+.modal-toggle-button.activate {
+	background-color: #68d391;
+	color: white;
+}
+
+.modal-toggle-button.activate:hover {
+	background-color: #48bb78;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+}
+
+.modal-delete-button {
+	padding: 10px 20px;
+	background-color: #e53e3e;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.modal-delete-button:hover {
+	background-color: #c53030;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(197, 48, 48, 0.3);
 }

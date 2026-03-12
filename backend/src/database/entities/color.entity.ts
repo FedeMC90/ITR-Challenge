@@ -23,14 +23,24 @@ export class Color {
 
 export enum Colors {
   NA = 'NA',
+  Black = 'black',
+  White = 'white',
   Red = 'red',
   Green = 'green',
   Blue = 'blue',
+  Silver = 'silver',
+  Navy = 'navy',
+  Gray = 'gray',
 }
 
 export enum ColorsHexCodes {
   NA = 'NA',
+  Black = '#000000',
+  White = '#FFFFFF',
   Red = '#FF0000',
   Green = '#00FF00',
   Blue = '#0000FF',
+  Silver = '#C0C0C0',
+  Navy = '#000080',
+  Gray = '#808080',
 }

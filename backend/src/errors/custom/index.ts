@@ -52,6 +52,11 @@ export const errorMessages = {
       message: 'not all product info is fulfilled',
       code: '60402',
     },
+    hasOrders: {
+      message:
+        'cannot delete product with existing orders. Consider deactivating it instead',
+      code: '60403',
+    },
   },
   global: {
     internalError: {

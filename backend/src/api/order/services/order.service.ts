@@ -5,6 +5,7 @@ import { EntityManager } from 'typeorm';
 import { Order, OrderStatus } from 'src/database/entities/order.entity';
 import { OrderItem } from 'src/database/entities/order-item.entity';
 import { Product } from 'src/database/entities/product.entity';
+import { ProductVariationPrice } from 'src/database/entities/productVariation_price.entity';
 import { CreateOrderDto } from '../dto/order.dto';
 import { OrderCreatedEvent } from 'src/common/events/order-created.event';
 import { OrderCancelledEvent } from 'src/common/events/order-cancelled.event';
@@ -42,11 +43,30 @@ export class OrderService {
           );
         }
 
+        // Get minimum price in USD for this product from variations
+        const productPrice = await manager
+          .createQueryBuilder(ProductVariationPrice, 'price')
+          .innerJoin('price.productVariation', 'variation')
+          .where('variation.productId = :productId', {
+            productId: product.id,
+          })
+          .andWhere('price.currencyCode = :currency', { currency: 'USD' })
+          .orderBy('price.price', 'ASC')
+          .getOne();
+
+        const price = productPrice ? Number(productPrice.price) : 0;
+
+        if (price === 0) {
+          throw new NotFoundException(
+            `No price found for product ${product.title}. Please configure product variations and prices first.`,
+          );
+        }
+
         const orderItem = manager.create(OrderItem, {
           orderId: order.id,
           productId: product.id,
           quantity: item.quantity,
-          price: 0, // Price would come from product variations - simplified for MVP
+          price: price,
         });
 
         orderItems.push(orderItem);

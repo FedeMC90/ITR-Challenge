@@ -11,6 +11,8 @@ import { Color } from '../entities/color.entity';
 import { Country } from '../entities/country.entity';
 import { Currency } from '../entities/currency.entity';
 import { Size } from '../entities/size.entity';
+import { ProductVariation } from '../entities/productVariation.entity';
+import { ProductVariationPrice } from '../entities/productVariation_price.entity';
 import { SeedService } from './seed.service';
 import { AdminSeeder } from './seeders/admin.seeder';
 import { CategorySeeder } from './seeders/category.seeder';
@@ -20,6 +22,7 @@ import { CurrencySeeder } from './seeders/currency.seeder';
 import { RolesSeeder } from './seeders/role.seeder';
 import { SizeSeeder } from './seeders/size.seeder';
 import { ProductSeeder } from './seeders/product.seeder';
+import { ProductVariationSeeder } from './seeders/product-variation.seeder';
 
 @Module({
   imports: [
@@ -33,6 +36,8 @@ import { ProductSeeder } from './seeders/product.seeder';
       Country,
       Currency,
       Product,
+      ProductVariation,
+      ProductVariationPrice,
     ]),
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
   ],
@@ -47,6 +52,7 @@ import { ProductSeeder } from './seeders/product.seeder';
     CountrySeeder,
     CurrencySeeder,
     ProductSeeder,
+    ProductVariationSeeder,
   ],
 })
 export class SeedModule {}

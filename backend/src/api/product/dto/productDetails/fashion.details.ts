@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Categories } from 'src/database/entities/category.entity';
 
 export class FashionDetails {
@@ -13,10 +13,6 @@ export class FashionDetails {
   @IsString()
   @IsNotEmpty()
   brand: string;
-
-  @IsString()
-  @IsIn(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
-  size: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
 
   @IsString()
   @IsNotEmpty()

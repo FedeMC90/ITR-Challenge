@@ -9,6 +9,7 @@ import { CurrencySeeder } from './seeders/currency.seeder';
 import { RolesSeeder } from './seeders/role.seeder';
 import { SizeSeeder } from './seeders/size.seeder';
 import { ProductSeeder } from './seeders/product.seeder';
+import { ProductVariationSeeder } from './seeders/product-variation.seeder';
 
 @Injectable()
 export class SeedService {
@@ -24,6 +25,7 @@ export class SeedService {
     countrySeeder: CountrySeeder,
     currencySeeder: CurrencySeeder,
     productSeeder: ProductSeeder,
+    productVariationSeeder: ProductVariationSeeder,
   ) {
     this.seeders = [
       rolesSeeder,
@@ -34,6 +36,7 @@ export class SeedService {
       countrySeeder,
       currencySeeder,
       productSeeder,
+      productVariationSeeder,
     ];
   }
 

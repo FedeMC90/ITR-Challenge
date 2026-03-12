@@ -22,9 +22,15 @@ export class Currency {
 }
 
 export enum CurrencyCodes {
+  USD = 'USD',
+  EUR = 'EUR',
+  ARS = 'ARS',
   EGP = 'EGP',
 }
 
 export enum CurrencyNames {
+  USD = 'US Dollar',
+  EUR = 'Euro',
+  ARS = 'Argentine Peso',
   EGP = 'Egyptian Pound',
 }

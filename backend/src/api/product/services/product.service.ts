@@ -2,12 +2,16 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { DeleteResult, EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { CreateProductDto, ProductDetailsDto } from '../dto/product.dto';
 import { Category } from '../../../database/entities/category.entity';
 import { Product } from 'src/database/entities/product.entity';
+import { OrderItem } from 'src/database/entities/order-item.entity';
+import { ProductVariation } from 'src/database/entities/productVariation.entity';
+import { ProductVariationPrice } from 'src/database/entities/productVariation_price.entity';
 import { errorMessages } from 'src/errors/custom';
 import { validate } from 'class-validator';
 import { successObject } from 'src/common/helper/sucess-response.interceptor';
@@ -69,9 +73,17 @@ export class ProductService {
 
     if (!category) throw new NotFoundException(errorMessages.category.notFound);
 
-    const product = await this.entityManager.create(Product, {
+    // Create product with all details in one transaction
+    const product = this.entityManager.create(Product, {
       category,
       merchantId,
+      title: data.title,
+      code: data.code,
+      description: data.description,
+      variationType: data.variationType,
+      about: data.about,
+      details: data.details,
+      isActive: false, // Start as inactive, will be activated separately
     });
 
     return this.entityManager.save(product);
@@ -153,13 +165,64 @@ export class ProductService {
     return true;
   }
 
-  async deleteProduct(productId: number, merchantId: number) {
+  async deleteProduct(productId: number, user: any) {
+    // Check if user is Admin (RoleId = 3)
+    const isAdmin = user.roles?.some((role: any) => role.id === 3);
+
+    // Check if product exists and belongs to user (if not admin)
+    const product = await this.entityManager.findOne(Product, {
+      where: isAdmin
+        ? { id: productId }
+        : { id: productId, merchantId: user.id },
+    });
+
+    if (!product) throw new NotFoundException(errorMessages.product.notFound);
+
+    // Check if product has any orders
+    const orderItemCount = await this.entityManager.count(OrderItem, {
+      where: { productId },
+    });
+
+    if (orderItemCount > 0) {
+      throw new BadRequestException(errorMessages.product.hasOrders);
+    }
+
+    // Delete in correct order due to foreign key constraints:
+    // 1. First delete all ProductVariationPrice records
+    // 2. Then delete all ProductVariation records
+    // 3. Finally delete the Product
+
+    // Get all product variations for this product
+    const variations = await this.entityManager.find(ProductVariation, {
+      where: { productId },
+    });
+
+    // Delete all prices for each variation
+    for (const variation of variations) {
+      await this.entityManager
+        .createQueryBuilder()
+        .delete()
+        .from(ProductVariationPrice)
+        .where('productVariationId = :variationId', {
+          variationId: variation.id,
+        })
+        .execute();
+    }
+
+    // Delete all variations
+    await this.entityManager
+      .createQueryBuilder()
+      .delete()
+      .from(ProductVariation)
+      .where('productId = :productId', { productId })
+      .execute();
+
+    // Finally delete the product
     const result = await this.entityManager
       .createQueryBuilder()
       .delete()
       .from(Product)
       .where('id = :productId', { productId })
-      .andWhere('merchantId = :merchantId', { merchantId })
       .execute();
 
     if (result.affected < 1)

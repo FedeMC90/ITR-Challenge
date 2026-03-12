@@ -1,5 +1,12 @@
 import apiClient from '../config/axios';
-import type { ProductResponse, ProductCreateResponse, ProductDetailsPayload, ApiResponse, Product } from '../types';
+import type {
+	ProductResponse,
+	ProductCreateResponse,
+	ProductDetailsPayload,
+	CreateProductPayload,
+	ApiResponse,
+	Product,
+} from '../types';
 
 export const productService = {
 	getProducts: async (page: number = 1, limit: number = 10): Promise<ProductResponse> => {
@@ -7,10 +14,13 @@ export const productService = {
 		return response.data;
 	},
 
-	createProduct: async (categoryId: number): Promise<ProductCreateResponse> => {
-		const response = await apiClient.post<ProductCreateResponse>('/product/create', {
-			categoryId,
-		});
+	getProduct: async (productId: number): Promise<Product> => {
+		const response = await apiClient.get<ApiResponse<Product>>(`/product/${productId}`);
+		return response.data.data;
+	},
+
+	createProduct: async (productData: CreateProductPayload): Promise<ProductCreateResponse> => {
+		const response = await apiClient.post<ProductCreateResponse>('/product/create', productData);
 		return response.data;
 	},
 
@@ -26,6 +36,11 @@ export const productService = {
 
 	toggleProductStatus: async (productId: number): Promise<ApiResponse<Product>> => {
 		const response = await apiClient.post<ApiResponse<Product>>(`/product/${productId}/toggle-status`, {});
+		return response.data;
+	},
+
+	deleteProduct: async (productId: number): Promise<ApiResponse<void>> => {
+		const response = await apiClient.delete<ApiResponse<void>>(`/product/${productId}`);
 		return response.data;
 	},
 };
