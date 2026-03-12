@@ -82,7 +82,7 @@
 
 ---
 
-### 5. React Frontend (Primary)
+### 5. React Frontend
 
 **Directory**: `frontend-react/`
 
@@ -282,7 +282,7 @@ Frontend running at: `http://localhost:5173`
 |                        | Bull             | 4.12.x  |
 |                        | Socket.io        | 4.8.x   |
 |                        | EventEmitter2    | 2.0.4   |
-| **Frontend (Primary)** | React            | 19.2.0  |
+| **Frontend**           | React            | 19.2.0  |
 |                        | Vite             | 7.3.1   |
 |                        | Axios            | 1.13.6  |
 |                        | Socket.io Client | 4.8.3   |
