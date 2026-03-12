@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { userService } from '../services/userService';
-import { roleService } from '../services/roleService';
-import type { User, Role } from '../types';
+import { userService } from '../../services/userService';
+import { roleService } from '../../services/roleService';
+import type { User, Role } from '../../types';
 import './ManageRoles.css';
 
 const ManageRoles: React.FC = () => {

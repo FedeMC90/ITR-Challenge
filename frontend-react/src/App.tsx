@@ -2,15 +2,15 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
-import { SocketRegistration } from './components/SocketRegistration';
-import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './components/Navbar';
-import Login from './components/Login';
-import ProductList from './components/ProductList';
-import CreateProduct from './components/CreateProduct';
-import CreateOrder from './components/CreateOrder';
-import OrderList from './components/OrderList';
-import ManageRoles from './components/ManageRoles';
+import { SocketRegistration } from './components/SocketRegistration/SocketRegistration';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import Navbar from './components/Navbar/Navbar';
+import Login from './components/Login/Login';
+import ProductList from './components/ProductList/ProductList';
+import CreateProduct from './components/CreateProduct/CreateProduct';
+import CreateOrder from './components/CreateOrder/CreateOrder';
+import OrderList from './components/OrderList/OrderList';
+import ManageRoles from './components/ManageRoles/ManageRoles';
 import './App.css';
 
 const App: React.FC = () => {

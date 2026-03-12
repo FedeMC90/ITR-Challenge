@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productService } from '../services/productService';
-import { productVariationService } from '../services/productVariationService';
-import { categoryService } from '../services/categoryService';
-import { colorService } from '../services/colorService';
-import { sizeService } from '../services/sizeService';
-import type { Category, Color, ComputerDetails, FashionDetails, ProductDetails, Size, VariationItem } from '../types';
+import { productService } from '../../services/productService';
+import { productVariationService } from '../../services/productVariationService';
+import { categoryService } from '../../services/categoryService';
+import { colorService } from '../../services/colorService';
+import { sizeService } from '../../services/sizeService';
+import type {
+	Category,
+	Color,
+	ComputerDetails,
+	FashionDetails,
+	ProductDetails,
+	Size,
+	VariationItem,
+} from '../../types';
 import './CreateProduct.css';
 
 const CreateProduct: React.FC = () => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productService } from '../services/productService';
-import { orderService } from '../services/orderService';
-import { useSocket } from '../hooks/useSocket';
-import type { Product, CreateOrderItem } from '../types';
+import { productService } from '../../services/productService';
+import { orderService } from '../../services/orderService';
+import { useSocket } from '../../hooks/useSocket';
+import type { Product, CreateOrderItem } from '../../types';
 import './CreateOrder.css';
 
 type OrderStatus = 'idle' | 'creating' | 'processing' | 'confirmed' | 'failed';

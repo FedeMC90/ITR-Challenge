@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { productService } from '../services/productService';
-import { productVariationService } from '../services/productVariationService';
-import { useAuth } from '../hooks/useAuth';
-import { useSocket } from '../hooks/useSocket';
-import type { Product } from '../types';
+import { productService } from '../../services/productService';
+import { productVariationService } from '../../services/productVariationService';
+import { useAuth } from '../../hooks/useAuth';
+import { useSocket } from '../../hooks/useSocket';
+import type { Product } from '../../types';
 import './ProductList.css';
 
 const ProductList: React.FC = () => {

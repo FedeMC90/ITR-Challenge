@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useSocket } from '../hooks/useSocket';
+import { useAuth } from '../../hooks/useAuth';
+import { useSocket } from '../../hooks/useSocket';
 
 /**
  * Component that automatically registers the authenticated user with the WebSocket

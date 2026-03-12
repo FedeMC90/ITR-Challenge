@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { orderService } from '../services/orderService';
-import type { Order } from '../types';
+import { orderService } from '../../services/orderService';
+import type { Order } from '../../types';
 import './OrderList.css';
 
 const OrderList: React.FC = () => {

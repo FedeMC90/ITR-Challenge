@@ -9,7 +9,6 @@
 ## Live Deployment
 
 🌐 **Frontend (React)**: https://itr-challenge.onrender.com
-🌐 **Frontend (Angular - Backup)**: https://ecommerce-front-wmjg.onrender.com  
 🔧 **Backend API**: https://ecommerce-back-azdg.onrender.com/api  
 📦 **Database**: PostgreSQL on Render
 
@@ -87,22 +86,7 @@
 
 **Directory**: `frontend-react/`
 
-**Files Created**: Complete React 19 + TypeScript application with Vite:
-
-- `src/types/index.ts` → TypeScript interfaces (User, Product, Order, Role, API responses)
-- `src/config/axios.ts` → Axios client with JWT interceptors
-- `src/context/AuthContext.tsx` → Global authentication state (Context API)
-- `src/services/` → API layer (productService, orderService, userService, roleService)
-- `src/components/Login.tsx` → Login form with registration modal
-- `src/components/ProductList.tsx` → Product grid with active/inactive sorting and toggle
-- `src/components/CreateProduct.tsx` → 3-step product creation flow
-- `src/components/CreateOrder.tsx` → Two-panel order creation (products + cart)
-- `src/components/OrderList.tsx` → Order history with cancel functionality
-- `src/components/ManageRoles.tsx` → Admin-only role management interface
-- `src/components/ProtectedRoute.tsx` → Route guard with admin checking
-- `src/App.tsx` → Main routing configuration
-- `.env.production` → Production API URL configuration
-- `public/_redirects` → Render SPA routing configuration
+Complete React 19 + TypeScript application with Vite:
 
 **Changes**:
 
@@ -115,7 +99,7 @@
 - ✅ **Vite Build System** → Fast development (HMR), optimized production bundle (92 kB gzipped)
 - ✅ **Production-Ready** → Environment variables, \_redirects for SPA routing
 
-**Why**: Challenge requirements changed from Angular to React. Provides modern developer experience with functional components, hooks, and optimized build times.
+**Why**: Challenge requirements. Provides modern developer experience with functional components, hooks, and optimized build times.
 
 **Technology Stack**:
 
@@ -126,30 +110,6 @@
 
 ---
 
-### 6. Angular Frontend (Backup)
-
-**Directory**: `frontend/`
-
-**Files Created**: Complete Angular 17 standalone application with:
-
-- `auth.service.ts`, `product.service.ts`, `order.service.ts` → API integration
-- `login.component.ts`, `product-list.component.ts`, `order-list.component.ts` → UI components
-- `auth.interceptor.ts` → JWT token handling
-- `environment.prod.ts` → Production API configuration
-
-**Changes**:
-
-- ✅ **Standalone components** → Modern Angular 17 architecture (no NgModules)
-- ✅ **JWT authentication** → Login, token storage, protected routes
-- ✅ **Product browsing** → Paginated product list with inventory display
-- ✅ **Order creation** → Shopping cart → place orders → view order history
-- ✅ **Order cancellation** → Cancel orders → auto stock release
-
-**Status**: Kept as backup; original implementation before framework migration.
-
-**Why**: Demonstrates full-stack integration; validates backend API functionality.
-
----
 
 ## Audit: Additional Improvements (Not Implemented)
 
@@ -206,7 +166,7 @@
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/FedeMC90/ITR-Challenge.git
 cd Challenge-ITR
 ```
 
@@ -249,7 +209,7 @@ npm run start:dev
 
 Backend running at: `http://localhost:3000/api`
 
-### 4. Frontend Setup (React - Primary)
+### 4. Frontend Setup
 
 ```bash
 cd frontend-react
@@ -263,24 +223,6 @@ npm run dev
 ```
 
 Frontend running at: `http://localhost:5173`
-
-**Alternative: Angular Frontend (Backup)**
-
-```bash
-cd frontend
-npm install
-
-# Configure environment (frontend/src/environments/environment.ts)
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000/api'
-};
-
-# Start frontend
-npm start
-```
-
-Frontend running at: `http://localhost:4200`
 
 ### 5. Test the Application
 
@@ -305,9 +247,6 @@ Frontend running at: `http://localhost:4200`
 |                        | Axios         | 1.13.6  |
 |                        | React Router  | 7.13.1  |
 |                        | TypeScript    | 5.9.3   |
-| **Frontend (Backup)**  | Angular       | 17.x    |
-|                        | TypeScript    | 5.x     |
-|                        | RxJS          | 7.x     |
 | **Deployment**         | Render        | Cloud   |
 
 ---
@@ -317,51 +256,5 @@ Frontend running at: `http://localhost:4200`
 ✅ **MVP Complete** - Full-stack event-driven e-commerce application
 
 ---
-
-## Migration Notes
-
-### Angular → React Framework Migration
-
-**Date**: March 2026  
-**Reason**: Challenge requirements changed post-submission from Angular to React  
-**Approach**: Parallel development (kept Angular as backup)
-
-**Migration Details**:
-
-1. **Created New React Project** (`frontend-react/`)
-   - Vite + React 19 + TypeScript 5.9
-   - Migrated all 7 components maintaining feature parity
-   - Replaced Angular services with axios + Context API
-   - Production build: 284.52 kB (92.21 kB gzipped)
-
-2. **Component Mapping**:
-   - Login → Login.tsx (with registration modal)
-   - ProductList → ProductList.tsx (grid + toggle active/inactive)
-   - CreateProduct → CreateProduct.tsx (3-step flow)
-   - CreateOrder → CreateOrder.tsx (cart system)
-   - OrderList → OrderList.tsx (cancel functionality)
-   - ManageRoles → ManageRoles.tsx (Admin only)
-   - ProtectedRoute → Route guards with admin checking
-
-3. **State Management Migration**:
-   - Angular Services + RxJS → React Context API + useState/useEffect
-   - AuthService → AuthContext.tsx (login, register, logout, hasRole)
-   - Product/Order/User/Role Services → axios-based service functions
-
-4. **Build & Deployment**:
-   - Development: Vite dev server (port 5173)
-   - Production: Optimized bundle with environment variables
-   - Render: Static Site with `_redirects` for SPA routing
-
-5. **Key Differences**:
-   - No dependency injection (React doesn't need it)
-   - Functional components + hooks (vs. class-based components)
-   - JSX instead of Angular templates
-   - Manual subscription management replaced by useEffect cleanup
-
-**Current Status**: React build successful, ready for deployment. Angular remains as backup.
-✅ **Production Deployed** - Live on Render with PostgreSQL  
-✅ **Core Features** - Auth, Products, Orders, Inventory, Events  
-✅ **Event-Driven** - Decoupled Order/Inventory modules
 
 **Demo Flow**: Login → Browse → Order → Cancel → Stock Update

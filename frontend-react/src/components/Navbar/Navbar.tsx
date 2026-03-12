@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { userService } from '../services/userService';
-import type { User } from '../types';
+import { useAuth } from '../../hooks/useAuth';
+import { userService } from '../../services/userService';
+import type { User } from '../../types';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
