@@ -6,6 +6,26 @@
 
 ---
 
+## 🚀 Quick Start (Docker)
+
+```bash
+# Clone repository
+git clone https://github.com/FedeMC90/ITR-Challenge.git
+cd Challenge-ITR
+
+# Start all services (PostgreSQL, Redis, Backend, Frontend)
+docker-compose --env-file .env.docker up -d
+
+# Wait ~30 seconds, then access:
+# Frontend: http://localhost
+# Backend: http://localhost:3000/api
+# Login: admin@admin.com / 12345678
+```
+
+**Note**: First run automatically executes database migrations and seeds sample data.
+
+---
+
 ## Live Deployment
 
 🌐 **Frontend (React)**: https://itr-challenge.onrender.com
@@ -135,6 +155,38 @@ Complete React 19 + TypeScript application with Vite:
 
 ---
 
+### 7. Docker Infrastructure & Deployment Improvements
+
+**Files Created**: `backend/docker-entrypoint.sh`, `docker-compose.yml`, `.env.docker.example`  
+**Files Modified**: `backend/Dockerfile`, `frontend-react/Dockerfile`, `init.sql`, `.gitignore`
+
+**Changes**:
+
+- ✅ **Node.js 20 Alpine** → Upgraded from Node 18 to avoid npm ci compatibility issues
+- ✅ **Automated Database Initialization** → Custom entrypoint script that:
+  - Waits for PostgreSQL to be ready (health check with retry logic)
+  - Executes database migrations automatically (`npm run migration:run`)
+  - Seeds initial data automatically (`npm run seed:run`)
+  - Starts the application only after successful DB setup
+- ✅ **Fixed init.sql conflict** → Removed duplicate `CREATE DATABASE` statement (PostgreSQL auto-creates via POSTGRES_DB env var)
+- ✅ **Package lock files committed** → Added `package-lock.json` to repository for deterministic builds
+- ✅ **Multi-stage Docker builds** → Optimized build process with separate builder and production stages
+- ✅ **Health checks** → Container health monitoring for PostgreSQL, Redis, and Backend
+- ✅ **Docker Compose orchestration** → Single command to start entire stack (DB + Redis + Backend + Frontend)
+
+**Technical Details**:
+
+```bash
+# backend/docker-entrypoint.sh highlights:
+- PostgreSQL readiness check with netcat (max 30 retries)
+- Error handling for migration/seed failures (non-blocking)
+- Proper signal handling with 'exec' for graceful shutdowns
+```
+
+**Why**: Simplified deployment, reproducible environments, and automatic database setup eliminate manual configuration steps and potential errors.
+
+---
+
 ## Audit: Additional Improvements (Not Implemented)
 
 ### Security Enhancements
@@ -179,6 +231,70 @@ Complete React 19 + TypeScript application with Vite:
 ---
 
 ## Local Development Setup
+
+### Option 1: Docker Compose (Recommended - Fastest Setup)
+
+**Prerequisites**: Docker Desktop installed and running
+
+#### Quick Start
+
+```bash
+# 1. Clone repository
+git clone https://github.com/FedeMC90/ITR-Challenge.git
+cd Challenge-ITR
+
+# 2. Create environment file (or use defaults)
+cp .env.docker.example .env.docker
+
+# 3. Start all services (builds images, runs migrations, seeds data)
+docker-compose --env-file .env.docker up -d
+
+# 4. Wait for services to be ready (~30 seconds first time)
+docker-compose ps
+
+# 5. Check backend logs to confirm initialization
+docker logs ecommerce-backend
+```
+
+**Access Points**:
+- 🌐 Frontend: http://localhost
+- 🔧 Backend API: http://localhost:3000/api
+- 📦 PostgreSQL: localhost:5432
+- 🔴 Redis: localhost:6379
+
+**Default Credentials**:
+- Email: `admin@admin.com`
+- Password: `12345678`
+
+**What Happens Automatically**:
+1. ✅ PostgreSQL + Redis containers start
+2. ✅ Backend builds with Node 20
+3. ✅ Entrypoint script waits for DB
+4. ✅ Migrations execute automatically
+5. ✅ Database seeds with initial data (admin user, products, categories, etc.)
+6. ✅ Backend API starts on port 3000
+7. ✅ Frontend builds and serves on port 80
+
+**Useful Commands**:
+
+```bash
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes (fresh start)
+docker-compose down -v
+
+# Rebuild after code changes
+docker-compose up -d --build
+```
+
+---
+
+### Option 2: Manual Setup (For Development)
 
 ### Prerequisites
 
@@ -273,22 +389,27 @@ Frontend running at: `http://localhost:5173`
 
 ## Technology Stack
 
-| Layer                  | Technology       | Version |
-| ---------------------- | ---------------- | ------- |
-| **Backend**            | NestJS           | 9.x     |
-|                        | TypeORM          | 0.3.x   |
-|                        | PostgreSQL       | 16      |
-|                        | Redis            | 7.x     |
-|                        | Bull             | 4.12.x  |
-|                        | Socket.io        | 4.8.x   |
-|                        | EventEmitter2    | 2.0.4   |
-| **Frontend**           | React            | 19.2.0  |
-|                        | Vite             | 7.3.1   |
-|                        | Axios            | 1.13.6  |
-|                        | Socket.io Client | 4.8.3   |
-|                        | React Router     | 7.13.1  |
-|                        | TypeScript       | 5.9.3   |
-| **Deployment**         | Render           | Cloud   |
+| Layer                  | Technology       | Version    |
+| ---------------------- | ---------------- | ---------- |
+| **Backend**            | NestJS           | 9.x        |
+|                        | Node.js          | 20 (Alpine)|
+|                        | TypeORM          | 0.3.x      |
+|                        | PostgreSQL       | 16 (Alpine)|
+|                        | Redis            | 7 (Alpine) |
+|                        | Bull             | 4.12.x     |
+|                        | Socket.io        | 4.8.x      |
+|                        | EventEmitter2    | 2.0.4      |
+| **Frontend**           | React            | 19.2.0     |
+|                        | Node.js          | 20 (Alpine)|
+|                        | Vite             | 7.3.1      |
+|                        | Axios            | 1.13.6     |
+|                        | Socket.io Client | 4.8.3      |
+|                        | React Router     | 7.13.1     |
+|                        | TypeScript       | 5.9.3      |
+| **Infrastructure**     | Docker           | Latest     |
+|                        | Docker Compose   | v3.8       |
+|                        | Nginx (Alpine)   | Latest     |
+| **Deployment**         | Render           | Cloud      |
 
 ---
 
